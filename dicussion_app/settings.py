@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'user',
+    'pollapp',
+    'postapp',
     'rest_framework',
+    'mptt',
 ]
 
 REST_FRAMEWORK = {
