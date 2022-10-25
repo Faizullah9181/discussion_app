@@ -14,6 +14,8 @@ import os
 
 from datetime import timedelta
 
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -45,6 +47,9 @@ INSTALLED_APPS = [
     'postapp',
     'rest_framework',
     'mptt',
+
+    'djoser',
+    'social_django',
 ]
 
 REST_FRAMEWORK = {
@@ -80,10 +85,45 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    # 'SEND_CONFIRMATION_EMAIL': True,
+    'SET_USERNAME_RETYPE': True,
+    'SET_PASSWORD_RETYPE':False,
+    'ACTIVATE_USER_AFTER_REGISTRATION': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    # 'ACTIVATION_URL': 'activate/{uid}/{token}',
+    # 'SEND_ACTIVATION_EMAIL': True,
+    'LOGIN_REDIRECT_URL': 'http://localhost:8000/',
+    'SIGNUP_REDIRECT_URL': 'http://localhost:8000/',
+    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000/google'],
+    'SERIALIZERS': {
+        'user_create': 'user.serializers.UserSerializer',
+        'user': 'user.serializers.UserSerializer',
+        'current_user': 'user.serializers.UserSerializer',
+    }
+}
+
 AUTH_USER_MODEL = 'user.Users'
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'user.backends.EmailPhoneUsernameAuthenticationBackend'
+
+)
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,6 +134,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'dicussion_app.urls'
+
+SET_ID = 1
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
 
 TEMPLATES = [
     {
@@ -117,17 +163,34 @@ WSGI_APPLICATION = 'dicussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': 'cPjY5htUu6t0iGnSH6hF',
+#         'HOST': 'containers-us-west-73.railway.app',
+#         'PORT': '6582',
+#     }
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'cPjY5htUu6t0iGnSH6hF',
-        'HOST': 'containers-us-west-73.railway.app',
-        'PORT': '6582',
+    'default': { 
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'dep53goum3pb4v',
+    'USER': 'nkgtkqyfcgnbbi',
+    'PASSWORD': 'c15e9613899a6523eb55988a6685e6ea85c33b0f6de6ab937347fa2dc501a932',
+    'HOST': 'ec2-3-208-79-113.compute-1.amazonaws.com',
+    'PORT': '5432', 
     }
 }
-
 
 
 # Password validation
@@ -172,5 +235,17 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '140391069257-be400t89h6fp1ijhm3d7b5gssl5nre0l.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
+
+CORS_ORIGIN_ALLOW_ALL=True
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+    'http://localhost:3000',
+
+]
