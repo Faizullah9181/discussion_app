@@ -1,6 +1,5 @@
 
 from django.contrib.auth.hashers import check_password
-from requests import Response
 from .models import Users as User
 from django.db.models import Q
 
@@ -16,7 +15,7 @@ class EmailPhoneUsernameAuthenticationBackend(object):
             )
 
         except User.DoesNotExist:
-            return Response({'error': 'Chala Ja Bsdk'}, status=400)
+            return None
 
         if user and check_password(password, user.password):
             return user
@@ -27,4 +26,4 @@ class EmailPhoneUsernameAuthenticationBackend(object):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            return Response({'error': 'Chala Ja Bsdk'}, status=400)
+            return None
