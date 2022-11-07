@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, Like
+from .models import Post, Comment, Like,UserDetails
 from pollapp.models import Poll
 from datetime import datetime
 from user.models import Users as User
@@ -9,7 +9,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'created_by', 'created_at', 'last_modified_by', 'last_modified_at', 'views',
-                  'allow_comments','comments_count','likes_count']
+                  'allow_comments','comment_count','like_count']
 
    
 
@@ -27,4 +27,8 @@ class LikeSerializer(serializers.ModelSerializer):
         model = Like
         fields = "__all__"
 
-    
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetails
+        fields = ['user','username','user_post_count','user_poll_count','user_posts','user_polls']

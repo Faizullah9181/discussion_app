@@ -14,6 +14,7 @@ class Post(models.Model):
     allow_comments = models.BooleanField(default=True)
     comment_count = models.IntegerField(blank=True, default=0)
     like_count = models.IntegerField(blank=True, default=0)
+    post_image = models.CharField(max_length=255, blank=True)
     views = models.IntegerField(blank=True, default=0)
 
     class Meta:
@@ -44,3 +45,19 @@ class Like(models.Model):
     poll = models.ForeignKey(Poll, related_name='poll_likes', on_delete=models.DO_NOTHING, null=True, blank=True)
     comment = models.ForeignKey(Comment, related_name='comment_likes', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True)
+
+
+
+class UserDetails(models.Model):
+    user  = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
+    username = models.CharField(null=False, blank=False, max_length=200)
+    user_post_count = models.IntegerField(blank=True, default=0 , null=True)
+    user_poll_count = models.IntegerField(blank=True, default=0 , null=True)
+    user_posts = models.ManyToManyField(Post, related_name='user_posts', blank=True)
+    user_polls = models.ManyToManyField(Poll, related_name='user_polls', blank=True)
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        ordering = ["-username"]

@@ -12,6 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
+from postapp.models import Post , Comment, Like
+from pollapp.models import Poll , PollOption
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -83,3 +85,6 @@ def getUserProfile(request):
     serializer = UserSerializer(user, many=False)
     user.save()
     return Response(serializer.data)
+
+
+    
