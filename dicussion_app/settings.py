@@ -285,4 +285,3 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 
-}
