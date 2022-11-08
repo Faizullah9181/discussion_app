@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll
-from .models import Post, Comment, Like, UserDetails,Reply
-from .serializers import PostSerializer, CommentSerializer, LikeSerializer, UserDetailsSerializer,ReplySerializer
+from .models import Post, Comment, Like,Reply
+from user.serializers import UserSerializer
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer,ReplySerializer
 from pollapp.paginators import PollPaginator as Paginator
 import datetime
 from rest_framework.decorators import api_view, permission_classes
@@ -88,17 +89,15 @@ def delete_post(request, pk):
 @permission_classes([IsAuthenticated])
 def getUserDetails(request):
     user = request.user
-    user_details = UserDetails.objects.create(user=user)
-    user_details.user_posts.set(Post.objects.filter(
-            created_by=user).order_by('-created_at')[:5])
-    user_details.username = user.username
-    user_details.first_name = user.first_name
-    user_details.last_name = user.last_name
-    user_details.user_image=user.image
-    user_details.user_post_count = Post.objects.filter(created_by=user).count()
-    user_details.save()
-    serializer = UserDetailsSerializer(user_details, many=False)
-    return Response(serializer.data)
+    return Response({'user': user.id,
+    'username': user.username,
+    'user_post_count':Post.objects.filter(created_by=user).count(),
+    'user_poll_count':Poll.objects.filter(created_by=user).count(),
+    'user_posts':Post.objects.filter(created_by=user).order_by('-created_at')[:5].values_list('id',flat=True),
+    'first_name': user.first_name,
+    'last_name': user.last_name,
+    'user_image': user.image ,
+    })
 
 
 @api_view(['GET'])
