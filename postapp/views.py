@@ -88,15 +88,18 @@ def delete_post(request, pk):
 @permission_classes([IsAuthenticated])
 def getUserDetails(request):
     user = request.user
-    user_details = UserDetails.objects.create(user=request.user)
-    user_details.user_posts.set(Post.objects.filter(
-        created_by=user).order_by('-created_at')[:5])
-    user_details.username = user.username
-    user_details.first_name = user.first_name
-    user_details.last_name = user.last_name
-    user_details.user_image = user.image
-    user_details.user_post_count = Post.objects.filter(created_by=user).count()
-    user_details.save()
+    try:
+        user_details = UserDetails.objects.get(user=user)
+    except:
+         user_details = UserDetails.objects.create(user=request.user)
+         user_details.user_posts.set(Post.objects.filter(
+            created_by=user).order_by('-created_at')[:5])
+         user_details.username = user.username
+         user_details.first_name = user.first_name
+         user_details.last_name = user.last_name
+         user_details.user_image = user.image
+         user_details.user_post_count = Post.objects.filter(created_by=user).count()
+         user_details.save()
     serializer = UserDetailsSerializer(user_details, many=False)
     return Response(serializer.data)
 
@@ -158,24 +161,24 @@ def create_comment(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def get_comments(self, request):
-    post_id = self.request.POST.get('post_id')
+def get_comments(request):
+    post_id = request.POST.get('post_id')
     poll_id = request.POST.get('poll_id')
     comment_id = request.POST.get('comment_id')
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
-            comments = Comment.objects.filter(post=post)
+            comments = Comment.objects.filter(post=post).order_by('-created_at')
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
-            comments = Comment.objects.filter(poll=poll)
+            comments = Comment.objects.filter(poll=poll).order_by('-created_at')
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
-            replies = Reply.objects.filter(comment=comment)
+            replies = Reply.objects.filter(comment=comment).order_by('-created_at')
             serializer = ReplySerializer(replies, many=True)
             return Response(serializer.data)
 
@@ -211,4 +214,81 @@ def delete_comment(request):
             reply = Reply.objects.get(id=reply_id)
             reply.delete()
             return Response('Reply Deleted :(')
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def put_like(request):
+    post_id = request.POST.get('post_id')
+    poll_id = request.POST.get('poll_id')
+    comment_id = request.POST.get('comment_id')
+    reply_id = request.POST.get('reply_id')
+    if post_id or poll_id or comment_id or reply_id:
+        if post_id:
+            post = Post.objects.get(id=post_id)
+            like = Like.objects.filter(post=post, created_by=request.user)
+            if like:
+                like.delete()
+                post.like_count -= 1
+                post.save()
+                return Response({'like_count': post.like_count})
+            else:
+                like = Like.objects.create(
+                    post=post,
+                    created_by=request.user,
+                    created_at=datetime.now()
+                )
+                post.like_count += 1
+                post.save()
+                return Response({'like_count': post.like_count})
+        elif poll_id:
+            poll = Poll.objects.get(id=poll_id)
+            like = Like.objects.filter(poll=poll, created_by=request.user)
+            if like:
+                like.delete()
+                poll.like_count -= 1
+                poll.save()
+                return Response({'like_count': poll.like_count})
+            else:
+                like = Like.objects.create(
+                    poll=poll,
+                    created_by=request.user,
+                    created_at=datetime.now()
+                )
+                poll.like_count += 1
+                poll.save()
+                return Response({'like_count': poll.like_count})
+        elif comment_id:
+            comment = Comment.objects.get(id=comment_id)
+            like = Like.objects.filter(comment=comment, created_by=request.user)
+            if like:
+                like.delete()
+                comment.like_count -= 1
+                comment.save()
+                return Response({'like_count': comment.like_count})
+            else:
+                like = Like.objects.create(
+                    comment=comment,
+                    created_by=request.user,
+                    created_at=datetime.now()
+                )
+                comment.like_count += 1
+                comment.save()
+                return Response({'like_count': comment.like_count})
+        elif reply_id:
+            reply = Reply.objects.get(id=reply_id)
+            like = Like.objects.filter(reply=reply, created_by=request.user)
+            if like:
+                like.delete()
+                reply.like_count -= 1
+                reply.save()
+                return Response({'like_count': reply.like_count})
+            else:
+                like = Like.objects.create(
+                    reply=reply,
+                    created_by=request.user,
+                    created_at=datetime.now()
+                )
+                reply.like_count += 1
+                reply.save()
+                return Response({'like_count': reply.like_count})
 
