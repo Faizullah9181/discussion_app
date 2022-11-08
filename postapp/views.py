@@ -90,6 +90,7 @@ def getUserDetails(request):
     user = request.user
     try:
         user_details = UserDetails.objects.get(user=user)
+        user_details.user_image =user.image
     except:
          user_details = UserDetails.objects.create(user=request.user)
          user_details.user_posts.set(Post.objects.filter(
