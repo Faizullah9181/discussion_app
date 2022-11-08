@@ -55,7 +55,7 @@ class UserDetails(models.Model):
     username = models.CharField(null=False, blank=False, max_length=200)
     first_name = models.CharField(null=False, blank=False, max_length=200)
     last_name = models.CharField(null=False, blank=False, max_length=200)
-    user_image = models.CharField(max_length=255, blank=True)
+    user_image = models.URLField(null=True, blank=True,max_length=2000)
     user_post_count = models.IntegerField(blank=True, default=0 , null=True)
     user_poll_count = models.IntegerField(blank=True, default=0 , null=True)
     user_posts = models.ManyToManyField(Post, related_name='user_posts', blank=True)
