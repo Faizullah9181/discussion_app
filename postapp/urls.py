@@ -9,7 +9,6 @@ urlpatterns = [
     path('get/<int:pk>/', views.get_post, name='get_post'),
     path('getPosts/', views.get_posts, name='get_posts'),
     path('getPost/<int:pk>/', views.get_post, name='get_post'),
-    path('getdetails/', views.getUserDetails, name="user-details"),
     path('getUserPosts/<int:pk>', views.get_user_posts, name="user-posts"),
     path('getpostscount/', views.get_posts_count, name="posts-count"),
     path('createcomment/', views.create_comment, name="create-comment"),
