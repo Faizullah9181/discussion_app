@@ -21,7 +21,7 @@ from django.views.generic import TemplateView
 
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name="blog/index.html")),
+    # path('', TemplateView.as_view(template_name="blog/index.html")),
     path('admin/', admin.site.urls),
     path('api/users/', include('user.urls')),
     path('api/post/', include('postapp.urls')),

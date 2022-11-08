@@ -1,12 +1,11 @@
 from django.db import models
 from user.models import Users
 from pollapp.models import Poll
-from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Post(models.Model):
     title = models.CharField(null=False, blank=False, max_length=200)
-    content = models.TextField(null=True, blank=True)
+    content = models.TextField(null=True, blank=True,max_length=2000)
     created_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(Users, related_name='post_creator', on_delete=models.SET_NULL, null=True)
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
@@ -24,20 +23,23 @@ class Post(models.Model):
         return self.title
 
 
-class Comment(MPTTModel):
-    post = models.ForeignKey(Post, related_name='post_comments', on_delete=models.DO_NOTHING, null=True, blank=True)
-    poll = models.ForeignKey(Poll, related_name='poll_comments', on_delete=models.DO_NOTHING, null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-    content = models.TextField(null=False, blank=False)
+class Comment(models.Model):
+    content = models.TextField(null=True, blank=True, max_length=2000)
+    created_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(Users, related_name='comment_creator', on_delete=models.SET_NULL, null=True)
+    last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    post = models.ForeignKey(Post, related_name='post', on_delete=models.CASCADE, null=True)
+    poll = models.ForeignKey(Poll, related_name='poll', on_delete=models.CASCADE, null=True)
     like_count = models.IntegerField(blank=True, default=0)
-    created_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
-    created_by = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True)
+    reply_count = models.IntegerField(blank=True, default=0)
 
-    def __str__(self):
-        return self.content
-
-    class MPTTMeta:
-        order_insertion_by = ['created_at']
+class Reply(models.Model):
+    content = models.TextField(null=True, blank=True, max_length=2000)
+    created_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(Users, related_name='reply_creator', on_delete=models.SET_NULL, null=True)
+    last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    comment = models.ForeignKey(Comment, related_name='comment', on_delete=models.CASCADE, null=True)
+    like_count = models.IntegerField(blank=True, default=0)
 
 
 class Like(models.Model):
@@ -51,6 +53,9 @@ class Like(models.Model):
 class UserDetails(models.Model):
     user  = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
     username = models.CharField(null=False, blank=False, max_length=200)
+    first_name = models.CharField(null=False, blank=False, max_length=200)
+    last_name = models.CharField(null=False, blank=False, max_length=200)
+    user_image = models.CharField(max_length=255, blank=True)
     user_post_count = models.IntegerField(blank=True, default=0 , null=True)
     user_poll_count = models.IntegerField(blank=True, default=0 , null=True)
     user_posts = models.ManyToManyField(Post, related_name='user_posts', blank=True)
