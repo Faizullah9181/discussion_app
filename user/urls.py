@@ -9,4 +9,5 @@ urlpatterns = [
     path('profile/update/', views.updateUserProfile, name="user-profile-update"),
     path('updatepassword/', views.updateuserPassword,
          name="user-password-update"),
+    
 ]
