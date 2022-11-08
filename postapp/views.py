@@ -88,19 +88,15 @@ def delete_post(request, pk):
 @permission_classes([IsAuthenticated])
 def getUserDetails(request):
     user = request.user
-    try:
-        user_details = UserDetails.objects.get(user=user)
-        user_details.user_image =user.image
-    except:
-         user_details = UserDetails.objects.create(user=request.user)
-         user_details.user_posts.set(Post.objects.filter(
+    user_details = UserDetails.objects.create(user=user)
+    user_details.user_posts.set(Post.objects.filter(
             created_by=user).order_by('-created_at')[:5])
-         user_details.username = user.username
-         user_details.first_name = user.first_name
-         user_details.last_name = user.last_name
-         user_details.user_image = user.image
-         user_details.user_post_count = Post.objects.filter(created_by=user).count()
-         user_details.save()
+    user_details.username = user.username
+    user_details.first_name = user.first_name
+    user_details.last_name = user.last_name
+    user_details.user_image=user.image
+    user_details.user_post_count = Post.objects.filter(created_by=user).count()
+    user_details.save()
     serializer = UserDetailsSerializer(user_details, many=False)
     return Response(serializer.data)
 
