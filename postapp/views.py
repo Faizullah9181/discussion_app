@@ -93,7 +93,7 @@ def getUserDetails(request):
     'username': user.username,
     'user_post_count':Post.objects.filter(created_by=user).count(),
     'user_poll_count':Poll.objects.filter(created_by=user).count(),
-    'user_posts':Post.objects.filter(created_by=user).order_by('-created_at')[:5].values_list('id',flat=True),
+    # 'user_posts':Post.objects.filter(created_by=user).order_by('-created_at')[:5].values_list('id',flat=True)
     'first_name': user.first_name,
     'last_name': user.last_name,
     'user_image': user.image ,
