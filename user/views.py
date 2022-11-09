@@ -86,5 +86,8 @@ def getUserProfile(request):
     user.save()
     return Response(serializer.data)
 
-
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getImage(request):
+    user = request.user
+    return Response({"user_image":user.image})
