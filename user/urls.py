@@ -8,7 +8,7 @@ urlpatterns = [
     path('register/', views.registerUser, name='register'),
     path('details/', views.getUserProfile, name="users-details"),
     path('profile/', post_views.getUserDetails, name="user-profile"),
-    path('userImage/', views.getImage, name="user-image"),
+    path('usernameImage/', views.getImage, name="user-image"),
     path('profile/update/', views.updateUserProfile, name="user-profile-update"),
     path('updatepassword/', views.updateuserPassword,
          name="user-password-update"),
