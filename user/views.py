@@ -90,4 +90,4 @@ def getUserProfile(request):
 @permission_classes([IsAuthenticated])
 def getImage(request):
     user = request.user
-    return Response({"user_image":user.image})
+    return Response({"username":user.username,"user_image":user.image})

@@ -82,7 +82,7 @@ def delete_post(request, pk):
     if request.user != post.created_by:
         return Response({'detail': 'Not authorized to delete this post'}, status=status.HTTP_400_BAD_REQUEST)
     post.delete()
-    return Response('Post Deleted :(')
+    return Response('Post Deleted')
 
 
 @api_view(['GET'])
@@ -205,11 +205,11 @@ def delete_comment(request):
         if comment_id:
             comment = Comment.objects.get(id=comment_id)
             comment.delete()
-            return Response('Comment Deleted :(')
+            return Response('Comment Deleted')
         elif reply_id:
             reply = Reply.objects.get(id=reply_id)
             reply.delete()
-            return Response('Reply Deleted :(')
+            return Response('Reply Deleted ')
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
