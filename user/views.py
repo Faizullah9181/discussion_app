@@ -91,3 +91,10 @@ def getUserProfile(request):
 def getImage(request):
     user = request.user
     return Response({"username":user.username,"user_image":user.image})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserbyId(request, pk):
+    user = Users.objects.get(id=pk)
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)

@@ -13,7 +13,7 @@ class Post(models.Model):
     allow_comments = models.BooleanField(default=True)
     comment_count = models.IntegerField(blank=True, default=0)
     like_count = models.IntegerField(blank=True, default=0)
-    post_image = models.CharField(max_length=255, blank=True)
+    post_image = models.CharField(max_length=255, blank=True, null=True)
     views = models.IntegerField(blank=True, default=0)
 
     class Meta:
