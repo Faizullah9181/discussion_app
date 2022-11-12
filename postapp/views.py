@@ -30,6 +30,7 @@ def get_posts(request):
     posts = Post.objects.all()
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
+    
 
 
 @api_view(['GET'])
@@ -38,6 +39,7 @@ def get_post(request, pk):
     post = Post.objects.get(id=pk)
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
+
 
 
 @api_view(['POST'])
@@ -106,6 +108,7 @@ def get_posts_count(request):
     posts = Post.objects.all()
     count = posts.count()
     return Response({'count': count})
+
 
 
 @api_view(['POST'])
