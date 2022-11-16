@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Poll, PollOption
-from .serializers import PollSerializer, PollOptionSerializer
+from .serializers import PollSerializer, PollOptionSerializer , PollDetailsSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -72,4 +72,29 @@ def vote_poll(request):
     poll_option.save()
     serializer = PollOptionSerializer(poll_option, many=False)
     return Response(serializer.data)
-    
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_poll(request, pk):
+    poll = Poll.objects.get(id=pk)
+    serializer = PollSerializer(poll, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_poll_options(request, pk):
+    poll = Poll.objects.get(id=pk)
+    serializer = PollOptionSerializer(poll.poll_options, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  
+def get_poll_details(request, pk):
+    poll = Poll.objects.get(id=pk)
+    serializer = PollDetailsSerializer(poll, many=False)
+    return Response(serializer.data)
+
+

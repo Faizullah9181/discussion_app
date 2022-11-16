@@ -23,6 +23,3 @@ class PollOption(models.Model):
     content = models.TextField(null=True, blank=True,max_length=2000)
     votes = models.IntegerField(blank=True, default=0)
     voted_by = models.ManyToManyField(Users, related_name='voted_by')
-
-    def __str__(self):
-        return self.option
