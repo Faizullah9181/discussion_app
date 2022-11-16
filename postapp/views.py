@@ -84,7 +84,7 @@ def delete_post(request, pk):
     if request.user != post.created_by:
         return Response({'detail': 'Not authorized to delete this post'}, status=status.HTTP_400_BAD_REQUEST)
     post.delete()
-    return Response('Post Deleted')
+    return Response({'detail': 'Post deleted'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
