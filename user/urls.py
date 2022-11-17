@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . views import cloudinary_delete_image
 from postapp import views as post_views
 
 urlpatterns = [
@@ -13,5 +14,5 @@ urlpatterns = [
     path('updatepassword/', views.updateuserPassword,
          name="user-password-update"),
     path('getuserbyId/<str:pk>/', views.getUserbyId, name="user-by-id"),
-    
+    path('deleteimage/', cloudinary_delete_image, name="delete-image"),
 ]

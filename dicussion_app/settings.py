@@ -14,6 +14,7 @@ import os
 
 from datetime import timedelta
 
+import cloudinary
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -55,6 +56,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 REST_FRAMEWORK = {
@@ -144,6 +148,7 @@ SITE_ID = 2
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 TEMPLATES = [
@@ -168,23 +173,23 @@ WSGI_APPLICATION = 'dicussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'cpSl1a9tAfsP4GWZkUx1',
-        'HOST': 'containers-us-west-80.railway.app',
-        'PORT': '7769',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': 'cpSl1a9tAfsP4GWZkUx1',
+#         'HOST': 'containers-us-west-80.railway.app',
+#         'PORT': '7769',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # DATABASES = {
 #     'default': { 
@@ -285,3 +290,8 @@ CORS_ORIGIN_WHITELIST = [
 
 
 
+cloudinary.config(
+cloud_name = 'dufvphomq',
+api_key = '365359829586928',
+api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
+)

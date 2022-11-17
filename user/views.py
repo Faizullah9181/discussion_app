@@ -14,6 +14,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from postapp.models import Post , Comment, Like
 from pollapp.models import Poll , PollOption
+import cloudinary.uploader as uploader
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -98,3 +99,14 @@ def getUserbyId(request, pk):
     user = Users.objects.get(id=pk)
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def cloudinary_delete_image(request):
+    public_id = request.data['public_id']
+    uploader.destroy(public_id, invalidate=True)
+    return Response("Image deleted successfully")
+
+   
+    
+
