@@ -77,7 +77,7 @@ def update_post(request, pk):
     return Response(serializer.data)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_post(request, pk):
     post = Post.objects.get(id=pk)
