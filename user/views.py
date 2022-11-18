@@ -106,6 +106,7 @@ def getUserbyId(request, pk):
 def cloudinary_delete_image(request):
     public_id = request.data['public_id']
     uploader.destroy(public_id, invalidate=True)
+    return Response({"Image deleted successfully"})
 
    
     
