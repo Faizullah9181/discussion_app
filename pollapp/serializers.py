@@ -2,20 +2,20 @@ from .models import Poll, PollOption
 
 from rest_framework import serializers
 
-
 class PollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poll
-        fields = '__all__'
+        fields = ['id', 'title', 'content', 'created_at', 'created_by', 'last_modified_at', 'last_modified_by', 'allow_comments', 'comment_count', 'like_count']
+
+
+
+
 
 
 class PollOptionSerializer(serializers.ModelSerializer):
+    poll = PollSerializer(many=False, read_only=True)
     class Meta:
         model = PollOption
-        fields = '__all__'
+        fields = ['id','poll','content','votes','voted_by']
 
-class PollDetailsSerializer(serializers.ModelSerializer):
-    poll_options = PollOptionSerializer(read_only= True, many=True)
-    class Meta:
-        model = Poll
-        fields = ['id', 'title', 'created_by', 'created_at', 'allow_comments', 'poll_options']
+

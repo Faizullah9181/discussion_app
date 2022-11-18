@@ -178,9 +178,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'railway',
         'USER': 'postgres',
-        'PASSWORD': 'cpSl1a9tAfsP4GWZkUx1',
-        'HOST': 'containers-us-west-80.railway.app',
-        'PORT': '7769',
+        'PASSWORD': 'PxlK9duRXsfZhUgxlaWT',
+        'HOST': 'containers-us-west-125.railway.app',
+        'PORT': '7510',
     }
 }
 
@@ -291,7 +291,7 @@ CORS_ORIGIN_WHITELIST = [
 
 
 cloudinary.config(
-cloud_name = 'dufvphomq',
-api_key = '365359829586928',
-api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
+cloud_name = 'dyjqmfjwh',
+api_key = '734827844593252',
+api_secret = 'xwnKFgL_I17mAhxpoKIJHQnVumI',
 )

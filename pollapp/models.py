@@ -4,6 +4,7 @@ from user.models import Users
 
 class Poll(models.Model):
     title = models.CharField(null=False, blank=False, max_length=200)
+    content = models.TextField(null=False, blank=False)
     created_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(Users, related_name='creator', on_delete=models.SET_NULL, null=True)
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
