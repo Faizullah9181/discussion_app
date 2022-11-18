@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Poll, PollOption
-from .serializers import PollSerializer, PollOptionSerializer , PollDetailsSerializer
+from .serializers import PollSerializer, PollOptionSerializer
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -18,84 +18,28 @@ from datetime import datetime
 
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_polls(request):
-    polls = Poll.objects.all()
-    serializer = PollSerializer(polls, many=True)
-    return Response(serializer.data)
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_poll(request):
+    user = request.user
     data = request.data
     poll = Poll.objects.create(
-        title=data['title'],
-        created_by=request.user,
-        allow_comments=data['allow_comments'],
-        created_at=datetime.now(),
+        title = data['title'],
+        content = data['content'],
+        created_by = user,
+        allow_comments = data['allow_comments']
     )
-    serializer = PollSerializer(poll, many=False)
-    return Response(serializer.data)
+    poll.save()
+    for i in range(1,6):
+        if data.get('poll_option'+str(i)):
+            poll_option = PollOption.objects.create(
+                poll = poll,
+                content = data['poll_option'+str(i)]
+            )
+            poll_option.save()
+    # serializer = PollOptionSerializer(poll.polloption_set, many=True)
+    return Response('Poll Created', status=status.HTTP_201_CREATED)
+    # return Response(serializer.data)
 
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_poll_option(request):
-    data = request.data
-    poll_id = request.POST.get('poll_id')
-    poll = Poll.objects.get(id=poll_id)
-    poll_option = PollOption.objects.create(
-        poll=poll,
-        content=data['content'],
-    )
-    serializer = PollOptionSerializer(poll_option, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def vote_poll(request):
-    data =request.data
-    poll_id = request.POST.get('poll_id')
-    poll_option_id = request.POST.get('poll_option_id')
-    poll = Poll.objects.get(id=poll_id)
-    poll_option = PollOption.objects.get(id=poll_option_id)
-    # poll_option.votes += 1
-    # poll_option.voted_by.add(request.user)
-    if request.user in poll_option.voted_by.all():
-        poll_option.votes -= 1
-        poll_option.voted_by.remove(request.user)
-    else:
-        poll_option.votes += 1
-        poll_option.voted_by.add(request.user)
-    poll_option.save()
-    serializer = PollOptionSerializer(poll_option, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def get_poll(request, pk):
-    poll = Poll.objects.get(id=pk)
-    serializer = PollSerializer(poll, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def get_poll_options(request, pk):
-    poll = Poll.objects.get(id=pk)
-    serializer = PollOptionSerializer(poll.poll_options, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])  
-def get_poll_details(request, pk):
-    poll = Poll.objects.get(id=pk)
-    serializer = PollDetailsSerializer(poll, many=False)
-    return Response(serializer.data)
-
+   
 
