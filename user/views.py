@@ -102,7 +102,6 @@ def getUserbyId(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def cloudinary_delete_image(request):
         result = uploader.destroy(request.data['public_id'])
         if result['result'] == 'ok':
