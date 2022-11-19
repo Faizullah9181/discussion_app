@@ -102,11 +102,15 @@ def getUserbyId(request, pk):
 
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def cloudinary_delete_image(request):
-    public_id = request.data['public_id']
-    uploader.destroy(public_id, invalidate=True)
-    return Response({"message": "Image deleted successfully"}, status=status.HTTP_200_OK)
+        result = uploader.destroy(request.data['public_id'])
+        if result['result'] == 'ok':
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+    
+
 
    
     
