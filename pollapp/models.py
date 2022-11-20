@@ -11,6 +11,7 @@ class Poll(models.Model):
     last_modified_by = models.ForeignKey(Users, related_name='modifier', on_delete=models.SET_NULL, null=True)
     allow_comments = models.BooleanField(default=True)
     comment_count = models.IntegerField(blank=True, default=0)
+    poll_option = models.JSONField(null=True, blank=True)
     like_count = models.IntegerField(blank=True, default=0)
     class Meta:
         ordering = ["-created_at"]
