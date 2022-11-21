@@ -8,4 +8,5 @@ urlpatterns = [
     path('getUserPolls/', views.get_user_polls, name='get_user_polls'),
     path('deletePoll/<int:poll_id>/', views.delete_poll, name='delete_poll'),
     path('getallPolls/', views.get_all_polls, name='get_all_polls'),
+    path('vote/', views.vote_poll, name='vote'),
 ]
