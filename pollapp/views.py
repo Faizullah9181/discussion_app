@@ -15,6 +15,9 @@ from user.serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
+import json
+from django.http import JsonResponse
+
 
 
 @api_view(['POST'])
@@ -26,7 +29,11 @@ def create_poll(request):
         title=data['title'],
         content=data['content'],
         created_by=user,
-        allow_comments=data['allow_comments']
+        created_at=datetime.now(),
+        last_modified_by=user,
+        last_modified_at=datetime.now(),
+        allow_comments=data['allow_comments'],
+        private = data['private']
     )
     poll.save()
     for i in range(1, 7):
@@ -73,4 +80,22 @@ def get_all_polls(request):
     user = request.user
     polls = Poll.objects.all()
     serializer = PollSerializer(polls, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def vote_poll(request):
+    user = request.user
+    data = request.data
+    poll = Poll.objects.get(id=data['poll_id'])
+    poll_options = PollOption.objects.filter(poll=poll)
+    for poll_option in poll_options:
+        if user in poll_option.voted_by.all():
+            return Response({'message': 'You have already voted for this poll'}, status=status.HTTP_401_UNAUTHORIZED)
+    poll_option = PollOption.objects.get(id=data['poll_option_id'])
+    poll_option.votes += 1
+    poll_option.voted_by.add(user)
+    poll_option.save()
+    serializer = PollSerializer(poll)
     return Response(serializer.data, status=status.HTTP_200_OK)

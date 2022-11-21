@@ -9,6 +9,7 @@ class Poll(models.Model):
     created_by = models.ForeignKey(Users, related_name='creator', on_delete=models.SET_NULL, null=True)
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     last_modified_by = models.ForeignKey(Users, related_name='modifier', on_delete=models.SET_NULL, null=True)
+    private= models.BooleanField(default=False)
     allow_comments = models.BooleanField(default=True)
     comment_count = models.IntegerField(blank=True, default=0)
     poll_option = models.JSONField(null=True, blank=True)
