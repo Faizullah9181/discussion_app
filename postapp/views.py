@@ -77,14 +77,14 @@ def update_post(request, pk):
     return Response(serializer.data)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_post(request, pk):
     post = Post.objects.get(id=pk)
     if request.user != post.created_by:
         return Response({'detail': 'Not authorized to delete this post'}, status=status.HTTP_400_BAD_REQUEST)
     post.delete()
-    return Response('Post Deleted')
+    return Response({'detail': 'Post deleted'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

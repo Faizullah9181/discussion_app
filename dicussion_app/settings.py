@@ -14,6 +14,7 @@ import os
 
 from datetime import timedelta
 
+import cloudinary
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -55,6 +56,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 REST_FRAMEWORK = {
@@ -144,6 +148,7 @@ SITE_ID = 2
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 TEMPLATES = [
@@ -171,13 +176,15 @@ WSGI_APPLICATION = 'dicussion_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'cpSl1a9tAfsP4GWZkUx1',
-        'HOST': 'containers-us-west-80.railway.app',
-        'PORT': '7769',
+        'NAME': 'dep53goum3pb4v',
+        'USER': 'nkgtkqyfcgnbbi',
+        'PASSWORD': 'c15e9613899a6523eb55988a6685e6ea85c33b0f6de6ab937347fa2dc501a932',
+        'HOST': 'ec2-3-208-79-113.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
+
+
 
 # DATABASES = {
 #     'default': {
@@ -284,3 +291,9 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 
+
+cloudinary.config(
+cloud_name = 'dyjqmfjwh',
+api_key = '734827844593252',
+api_secret = 'xwnKFgL_I17mAhxpoKIJHQnVumI',
+)

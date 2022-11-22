@@ -66,3 +66,29 @@ class UserDetails(models.Model):
 
     class Meta:
         ordering = ["-username"]
+
+
+
+# from faker import Faker               
+# from postapp.models import Post
+# from user.models import Users
+# faker = Faker()
+
+
+
+
+# for i in range(50):
+#        user = Users.objects.filter(id=1).first()
+#        post=Post()
+#        post.title=faker.sentence()
+#        post.content=faker.text()
+#        post.created_at="2022-11-18T15:16:38.685406Z"
+#        post.created_by=  user
+#        post.last_modified_at="2022-11-18T15:16:38.685406Z"
+#        post.last_modified_by= user
+#        post.allow_comments=True
+#        post.comment_count=0
+#        post.like_count = 0
+#        post.post_image = faker.image_url()
+#        post.views=0
+#        post.save()
