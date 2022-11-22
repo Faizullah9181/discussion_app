@@ -90,6 +90,8 @@ def vote_poll(request):
     data = request.data
     poll = Poll.objects.get(id=data['poll_id'])
     poll_options = PollOption.objects.filter(poll=poll)
+    if not poll_options.filter(id=data['poll_option_id']).exists():
+        return Response({'message': 'Invalid poll option'}, status=status.HTTP_400_BAD_REQUEST)
     for poll_option in poll_options:
         if user in poll_option.voted_by.all():
             return Response({'message': 'You have already voted for this poll'}, status=status.HTTP_401_UNAUTHORIZED)
