@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Poll, PollOption
-from .serializers import PollSerializer, PollOptionSerializer
+from .serializers import PollSerializer , PollSerializer2
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -17,8 +17,14 @@ from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
 import json
 from django.http import JsonResponse
+import numpy as np
 
-
+def is_voted(poll, user):
+    poll_options = PollOption.objects.filter(poll=poll)
+    for poll_option in poll_options:
+        if user in poll_option.voted_by.all():
+            return True
+    return False
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -51,7 +57,15 @@ def create_poll(request):
 def get_poll(request, poll_id):
     user = request.user
     poll = Poll.objects.get(id=poll_id)
-    serializer = PollSerializer(poll)
+    poll_options = PollOption.objects.filter(poll=poll)
+    for poll_option in poll_options:
+        if user in poll_option.voted_by.all():
+            poll.is_voted = True
+            break
+    if poll.created_by != user and poll.private == True:
+        serializer = PollSerializer2(poll)
+    else:
+        serializer = PollSerializer(poll)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -60,9 +74,15 @@ def get_poll(request, poll_id):
 def get_user_polls(request):
     user = request.user
     polls = Poll.objects.filter(created_by=user)
+    poll_options = PollOption.objects.filter(poll__in=polls)
+    for poll_option in poll_options:
+        if user in poll_option.voted_by.all():
+            poll_option.poll.is_voted = True
     serializer = PollSerializer(polls, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+    
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_poll(request, poll_id):
@@ -79,9 +99,49 @@ def delete_poll(request, poll_id):
 def get_all_polls(request):
     user = request.user
     polls = Poll.objects.all()
-    serializer = PollSerializer(polls, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    poll_options = PollOption.objects.filter(poll__in=polls)
+    p = []
+    for poll in polls:
+        if poll.created_by != user and poll.private == True:
+            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            print(poll.is_voted)
+            serializer = PollSerializer2(poll)
+            p.append(serializer.data)
+        elif poll.created_by == user:
+            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            serializer = PollSerializer(poll)
+            p.append(serializer.data)
+        elif poll.private == False:
+            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            serializer = PollSerializer(poll)
+            p.append(serializer.data)
+    return Response(p, status=status.HTTP_200_OK)
 
+# def get_all_polls(request):
+#     user = request.user
+#     polls = Poll.objects.all()
+#     poll_options = PollOption.objects.filter(poll__in=polls)
+#     p = []
+#     for poll in polls:
+#         if poll.created_by != user and poll.private == True:
+#             for poll_option in poll_options:
+#                 if user in poll_option.voted_by.all():
+#                     poll.is_voted = True
+#             serializer = PollSerializer2(poll)
+#             p.append(serializer.data)
+#         elif poll.created_by == user:
+#             for poll_option in poll_options:
+#                 if user in poll_option.voted_by.all():
+#                     poll.is_voted = True
+#             serializer = PollSerializer(poll)
+#             p.append(serializer.data)
+#         elif poll.private == False:
+#             for poll_option in poll_options:
+#                 if user in poll_option.voted_by.all():
+#                     poll.is_voted = True
+#             serializer = PollSerializer(poll)
+#             p.append(serializer.data)
+#     return Response(p, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -91,13 +151,25 @@ def vote_poll(request):
     poll = Poll.objects.get(id=data['poll_id'])
     poll_options = PollOption.objects.filter(poll=poll)
     if not poll_options.filter(id=data['poll_option_id']).exists():
-        return Response({'message': 'Invalid poll option'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Invalid poll option'}, status=status.HTTP_404_NOT_FOUND)
     for poll_option in poll_options:
         if user in poll_option.voted_by.all():
             return Response({'message': 'You have already voted for this poll'}, status=status.HTTP_401_UNAUTHORIZED)
     poll_option = PollOption.objects.get(id=data['poll_option_id'])
     poll_option.votes += 1
+    poll.total_votes += 1
+    poll.save()
     poll_option.voted_by.add(user)
+    for poll_option in poll_options:
+        if user in poll_option.voted_by.all():
+            poll.is_voted = True
     poll_option.save()
-    serializer = PollSerializer(poll)
+    if poll.created_by != user and poll.private == True:
+        serializer = PollSerializer2(poll)
+    else:
+        serializer = PollSerializer(poll)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
