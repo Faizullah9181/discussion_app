@@ -17,7 +17,6 @@ from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
 import json
 from django.http import JsonResponse
-import numpy as np
 
 def is_voted(poll, user):
     poll_options = PollOption.objects.filter(poll=poll)
