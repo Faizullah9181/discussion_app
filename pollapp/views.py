@@ -155,14 +155,15 @@ def vote_poll(request):
         if user in poll_option.voted_by.all():
             return Response({'message': 'You have already voted for this poll'}, status=status.HTTP_401_UNAUTHORIZED)
     poll_option = PollOption.objects.get(id=data['poll_option_id'])
-    poll_option.votes += 1
     poll.total_votes += 1
     poll.save()
     poll_option.voted_by.add(user)
     for poll_option in poll_options:
         if user in poll_option.voted_by.all():
             poll.is_voted = True
-    poll_option.save()
+    for poll_option in poll_options:
+        poll_option.votes = poll_option.voted_by.count()
+        poll_option.save()
     if poll.created_by != user and poll.private == True:
         serializer = PollSerializer2(poll)
     else:
