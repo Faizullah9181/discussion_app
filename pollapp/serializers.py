@@ -44,12 +44,6 @@ class PollSerializer(serializers.ModelSerializer):
         serializer = PollOptionSerializer(poll_options, many=True)
         return serializer.data
 
-    
-
-    
-        
-
-
 class PollSerializer2(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
     created_by = UserDetailSerializer()
