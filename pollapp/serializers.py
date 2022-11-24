@@ -34,6 +34,7 @@ class PollOptionSerializer2(serializers.ModelSerializer):
 
 class PollSerializer(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
+    created_by = UserDetailSerializer(read_only=True)
     class Meta:
         model = Poll
         fields = ['id', 'title', 'content', 'created_at', 'created_by','private' ,'is_voted','total_votes','last_modified_at', 'last_modified_by', 'poll_option','allow_comments', 'comment_count', 'like_count']
@@ -51,6 +52,7 @@ class PollSerializer(serializers.ModelSerializer):
 
 class PollSerializer2(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
+    created_by = UserDetailSerializer()
     
     class Meta:
         model = Poll
