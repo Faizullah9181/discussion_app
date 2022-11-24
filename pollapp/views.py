@@ -74,9 +74,8 @@ def get_user_polls(request):
     user = request.user
     polls = Poll.objects.filter(created_by=user)
     poll_options = PollOption.objects.filter(poll__in=polls)
-    for poll_option in poll_options:
-        if user in poll_option.voted_by.all():
-            poll_option.poll.is_voted = True
+    for poll in polls:
+        poll.is_voted = is_voted(poll, user)
     serializer = PollSerializer(polls, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
