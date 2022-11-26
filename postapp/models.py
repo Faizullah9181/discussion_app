@@ -11,6 +11,8 @@ class Post(models.Model):
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     last_modified_by = models.ForeignKey(Users, related_name='last_modifier', on_delete=models.SET_NULL, null=True)
     allow_comments = models.BooleanField(default=True)
+    is_liked = models.BooleanField(default=False)
+    Liked_by = models.ManyToManyField(Users, related_name='liked_by_post')
     comment_count = models.IntegerField(blank=True, default=0)
     like_count = models.IntegerField(blank=True, default=0)
     post_image = models.CharField(max_length=255, blank=True, null=True)
@@ -47,7 +49,8 @@ class Like(models.Model):
     poll = models.ForeignKey(Poll, related_name='poll_likes', on_delete=models.DO_NOTHING, null=True, blank=True)
     comment = models.ForeignKey(Comment, related_name='comment_likes', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True)
-
+    created_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(Users, related_name='like_creator', on_delete=models.SET_NULL, null=True)
 
 
 class UserDetails(models.Model):
