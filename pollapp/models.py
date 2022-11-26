@@ -14,6 +14,8 @@ class Poll(models.Model):
     comment_count = models.IntegerField(blank=True, default=0)
     total_votes = models.IntegerField(blank=True, default=0, null=True)
     is_voted = models.BooleanField(default=False)
+    is_liked = models.BooleanField(default=False)
+    liked_by = models.ManyToManyField(Users, related_name='liked_by_poll')
     poll_option = models.JSONField(null=True, blank=True)
     like_count = models.IntegerField(blank=True, default=0)
     class Meta:

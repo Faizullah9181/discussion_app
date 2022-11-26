@@ -20,6 +20,11 @@ from datetime import datetime
 @permission_classes([IsAuthenticated])
 def get_user_posts(request, pk):
     posts = Post.objects.filter(created_by=pk)
+    for post in posts:
+        if post.Liked_by.filter(id=request.user.id).exists():
+            post.is_liked = True
+        else:
+            post.is_liked = False
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
@@ -28,6 +33,11 @@ def get_user_posts(request, pk):
 @permission_classes([IsAuthenticated])
 def get_posts(request):
     posts = Post.objects.all()
+    for post in posts:
+        if post.Liked_by.filter(id=request.user.id).exists():
+            post.is_liked = True
+        else:
+            post.is_liked = False
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
     
@@ -37,6 +47,7 @@ def get_posts(request):
 @permission_classes([IsAuthenticated])
 def get_post(request, pk):
     post = Post.objects.get(id=pk)
+    post.is_liked = request.user in post.Liked_by.all()
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
 
@@ -70,6 +81,7 @@ def update_post(request, pk):
     post.content = data['content']
     post.post_image = data['post_image']
     post.last_modified_by = request.user
+    post.is_liked = request.user in post.Liked_by.all()
     post.last_modified_at = datetime.now()
     post.allow_comments = data['allow_comments']
     post.save()
@@ -228,8 +240,9 @@ def put_like(request):
             if like:
                 like.delete()
                 post.like_count -= 1
+                post.Liked_by.remove(request.user)
                 post.save()
-                return Response({'like_count': post.like_count})
+                return Response({'message': 'Like Removed','is_liked': False})
             else:
                 like = Like.objects.create(
                     post=post,
@@ -237,16 +250,18 @@ def put_like(request):
                     created_at=datetime.now()
                 )
                 post.like_count += 1
+                post.Liked_by.add(request.user)
                 post.save()
-                return Response({'like_count': post.like_count})
+                return Response({'message': 'Like Added','is_liked': True})
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             like = Like.objects.filter(poll=poll, created_by=request.user)
             if like:
                 like.delete()
                 poll.like_count -= 1
+                poll.liked_by.remove(request.user)
                 poll.save()
-                return Response({'like_count': poll.like_count})
+                return Response({'message': 'Like Removed','is_liked': False})
             else:
                 like = Like.objects.create(
                     poll=poll,
@@ -254,8 +269,9 @@ def put_like(request):
                     created_at=datetime.now()
                 )
                 poll.like_count += 1
+                poll.liked_by.add(request.user)
                 poll.save()
-                return Response({'like_count': poll.like_count})
+                return Response({'message': 'Like Added','is_liked': True})
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
             like = Like.objects.filter(comment=comment, created_by=request.user)

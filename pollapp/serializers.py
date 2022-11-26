@@ -37,7 +37,7 @@ class PollSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_at', 'created_by','private' ,'is_voted','total_votes','last_modified_at', 'last_modified_by', 'poll_option','allow_comments', 'comment_count', 'like_count']
+        fields = ['id', 'title', 'content', 'created_at', 'created_by','private' ,'is_voted','is_liked','total_votes','last_modified_at', 'last_modified_by', 'poll_option','allow_comments', 'comment_count', 'like_count']
 
     def get_poll_option(self, obj):
         poll_options = PollOption.objects.filter(poll=obj).order_by('id')
@@ -50,7 +50,7 @@ class PollSerializer2(serializers.ModelSerializer):
     
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_at', 'created_by','private' ,'is_voted','total_votes','last_modified_at', 'last_modified_by', 'poll_option','allow_comments', 'comment_count', 'like_count']
+        fields = ['id', 'title', 'content', 'created_at', 'created_by','private', 'is_liked','is_voted','total_votes','last_modified_at', 'last_modified_by', 'poll_option','allow_comments', 'comment_count', 'like_count']
 
     def get_poll_option(self, obj):
         poll_options = PollOption.objects.filter(poll=obj).order_by('id')
