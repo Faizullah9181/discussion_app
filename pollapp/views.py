@@ -178,7 +178,3 @@ def vote_poll(request):
     else:
         serializer = PollSerializer(poll)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
