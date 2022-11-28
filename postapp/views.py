@@ -226,14 +226,15 @@ def delete_comment(request):
             reply.delete()
             return Response('Reply Deleted ')
 
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def put_like(request):
-    post_id = request.POST.get('post_id')
-    poll_id = request.POST.get('poll_id')
-    comment_id = request.POST.get('comment_id')
-    reply_id = request.POST.get('reply_id')
-    if post_id or poll_id or comment_id or reply_id:
+    data = request.data
+    post_id = data.get('post_id')
+    poll_id = data.get('poll_id')
+    if post_id or poll_id :
         if post_id:
             post = Post.objects.get(id=post_id)
             like = Like.objects.filter(post=post, created_by=request.user)
@@ -252,7 +253,7 @@ def put_like(request):
                 post.like_count += 1
                 post.Liked_by.add(request.user)
                 post.save()
-                return Response({'message': 'Like Added','is_liked': True})
+                return Response({'message': 'Like Added','is_liked': True},status=status.HTTP_201_CREATED)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             like = Like.objects.filter(poll=poll, created_by=request.user)
@@ -272,38 +273,4 @@ def put_like(request):
                 poll.liked_by.add(request.user)
                 poll.save()
                 return Response({'message': 'Like Added','is_liked': True})
-        elif comment_id:
-            comment = Comment.objects.get(id=comment_id)
-            like = Like.objects.filter(comment=comment, created_by=request.user)
-            if like:
-                like.delete()
-                comment.like_count -= 1
-                comment.save()
-                return Response({'like_count': comment.like_count})
-            else:
-                like = Like.objects.create(
-                    comment=comment,
-                    created_by=request.user,
-                    created_at=datetime.now()
-                )
-                comment.like_count += 1
-                comment.save()
-                return Response({'like_count': comment.like_count})
-        elif reply_id:
-            reply = Reply.objects.get(id=reply_id)
-            like = Like.objects.filter(reply=reply, created_by=request.user)
-            if like:
-                like.delete()
-                reply.like_count -= 1
-                reply.save()
-                return Response({'like_count': reply.like_count})
-            else:
-                like = Like.objects.create(
-                    reply=reply,
-                    created_by=request.user,
-                    created_at=datetime.now()
-                )
-                reply.like_count += 1
-                reply.save()
-                return Response({'like_count': reply.like_count})
-
+        
