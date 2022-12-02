@@ -19,7 +19,7 @@ from datetime import datetime
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_posts(request, pk):
-    posts = Post.objects.filter(created_by=pk)
+    posts = Post.objects.filter(created_by=pk).order_by('-id')
     for post in posts:
         if post.Liked_by.filter(id=request.user.id).exists():
             post.is_liked = True
@@ -32,7 +32,7 @@ def get_user_posts(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_posts(request):
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by('-id')
     for post in posts:
         if post.Liked_by.filter(id=request.user.id).exists():
             post.is_liked = True
