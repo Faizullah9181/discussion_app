@@ -176,10 +176,10 @@ WSGI_APPLICATION = 'dicussion_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dep53goum3pb4v',
-        'USER': 'nkgtkqyfcgnbbi',
-        'PASSWORD': 'c15e9613899a6523eb55988a6685e6ea85c33b0f6de6ab937347fa2dc501a932',
-        'HOST': 'ec2-3-208-79-113.compute-1.amazonaws.com',
+        'NAME': 'nexusdiscuss',
+        'USER': 'nexusdiscuss',
+        'PASSWORD': 'i7bTSKhaAVB5qUqS7yaG2fc166xYf0Xz',
+        'HOST': 'dpg-ce3mufsgqg4c9hnmc1gg-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }
