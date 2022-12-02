@@ -45,8 +45,8 @@ class Reply(models.Model):
 
 
 class Like(models.Model):
-    post = models.ForeignKey(Post, related_name='post_likes', on_delete=models.DO_NOTHING, null=True, blank=True)
-    poll = models.ForeignKey(Poll, related_name='poll_likes', on_delete=models.DO_NOTHING, null=True, blank=True)
+    post = models.ForeignKey(Post, related_name='post_likes', on_delete=models.SET_NULL, null=True, blank=True)
+    poll = models.ForeignKey(Poll, related_name='poll_likes', on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.ForeignKey(Comment, related_name='comment_likes', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(null=True, blank=True)
