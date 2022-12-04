@@ -34,6 +34,7 @@ class Comment(models.Model):
     poll = models.ForeignKey(Poll, related_name='poll', on_delete=models.CASCADE, null=True)
     like_count = models.IntegerField(blank=True, default=0)
     reply_count = models.IntegerField(blank=True, default=0)
+    reply = models.JSONField(null=True, blank=True)
 
 class Reply(models.Model):
     content = models.TextField(null=True, blank=True, max_length=2000)

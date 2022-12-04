@@ -140,9 +140,8 @@ def create_comment(request):
             )
             post.comment_count += 1
             post.save()
-            return Response({'id': comment.id, 'post_id': post_id, 
-            'like_count':comment.like_count, 'content': comment.content, 
-            'created_by': comment.created_by.username, 'created_at': comment.created_at})
+            serializer = CommentSerializer(comment, many=False)
+            return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             comment = Comment.objects.create(
@@ -153,9 +152,8 @@ def create_comment(request):
             )
             poll.comment_count += 1
             poll.save()
-            return Response({'id': comment.id, 'poll_id': poll_id,
-            'like_count':comment.like_count, 'content': comment.content,
-            'created_by': comment.created_by.username, 'created_at': comment.created_at})
+            serializer = CommentSerializer(comment, many=False)
+            return Response(serializer.data)
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
             reply = Reply.objects.create(
@@ -166,9 +164,9 @@ def create_comment(request):
             )
             comment.reply_count += 1
             comment.save()
-            return Response({'id': reply.id, 'comment_id': comment_id,
-            'like_count':reply.like_count, 'content': reply.content,
-            'created_by': reply.created_by.username, 'created_at': reply.created_at})
+            serializer = CommentSerializer(comment, many=False)
+            return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -189,42 +187,44 @@ def get_comments(request):
             return Response(serializer.data)
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
-            replies = Reply.objects.filter(comment=comment).order_by('-created_at')
-            serializer = ReplySerializer(replies, many=True)
+            serializer = CommentSerializer(comment, many=False)
             return Response(serializer.data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_comment(request):
     comment_id = request.POST.get('comment_id')
-    reply_id = request.POST.get('reply_id')
+    reply_id = request.POST.get('child_comment_id')
     if comment_id or reply_id:
         if comment_id:
             comment = Comment.objects.get(id=comment_id)
             comment.content = request.data['content']
             comment.save()
-            return Response({'id': comment.id, 'like_count':comment.like_count, 'content': comment.content, 'created_by': comment.created_by.username, 'created_at': comment.created_at})
+            serializer = CommentSerializer(comment, many=False)
+            return Response(serializer.data)
         elif reply_id:
             reply = Reply.objects.get(id=reply_id)
             reply.content = request.data['content']
             reply.save()
-            return Response({'id': reply.id, 'like_count':reply.like_count, 'content': reply.content, 'created_by': reply.created_by.username, 'created_at': reply.created_at})
-        
+            serializer = CommentSerializer(reply, many=False)
+            return Response(serializer.data)
 
-@api_view(['DELETE'])
+
+
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_comment(request):
     comment_id = request.POST.get('comment_id')
-    reply_id = request.POST.get('reply_id')
+    reply_id = request.POST.get('child_comment_id')
     if comment_id or reply_id:
         if comment_id:
             comment = Comment.objects.get(id=comment_id)
             comment.delete()
-            return Response('Comment Deleted')
+            return Response({'Comment Deleted'}, status=status.HTTP_200_OK)
         elif reply_id:
             reply = Reply.objects.get(id=reply_id)
             reply.delete()
-            return Response('Reply Deleted ')
+            return Response({'Reply Deleted'}, status=status.HTTP_200_OK)
 
 
 

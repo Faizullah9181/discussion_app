@@ -25,16 +25,13 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = "__all__"
 
     
 class ReplySerializer(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
     class Meta:
         model = Reply
-        fields = "__all__"
+        fields = ["id", "content", "created_at", "created_by", "comment_id"]
     
     
 
@@ -45,3 +42,16 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    reply = serializers.SerializerMethodField()
+    created_by = UserDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["id", "content", "created_at", "created_by", "post", "poll",
+              "reply"]
+
+    def get_reply(self,obj):
+        reply = Reply.objects.filter(comment=obj).order_by('-created_at')
+        serializer = ReplySerializer(reply, many=True)
+        return serializer.data
