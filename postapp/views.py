@@ -273,7 +273,7 @@ def put_like(request):
                 return Response({'message': 'Like Added', 'is_liked': True})
 
 
-poppler_path = r"poppler-0.67.0\bin"
+poppler_path = "poppler-0.67.0/bin"
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_pdf_post(request):
