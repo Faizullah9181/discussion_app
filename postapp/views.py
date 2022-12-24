@@ -273,7 +273,6 @@ def put_like(request):
                 return Response({'message': 'Like Added', 'is_liked': True})
 
 
-poppler_path = "./poppler-0.67.0/bin"
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_pdf_post(request):
@@ -313,7 +312,7 @@ def create_pdf_post(request):
     for pdf in pdf_list:
         pdf_name = pdf.split("/")[-1]
         pdf_path = f"{folder_name}/{pdf_name}"
-        pages = convert_from_path(pdf_path, poppler_path=poppler_path)
+        pages = convert_from_path(pdf_path, 500)
         for page in pages:
             image_name = pdf_name.split(".")[0]
             page.save(f"pdfs/{image_name}.jpg", 'JPEG')
