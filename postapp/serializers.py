@@ -48,7 +48,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["id", "content", "created_at", "created_by", "post", "poll",
+        fields = ["id", "content", "created_at", "created_by", 
               "reply"]
 
     def get_reply(self,obj):

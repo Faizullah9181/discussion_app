@@ -1,20 +1,20 @@
+import os
 from user.models import Users
-from django.db.models import Q
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll
 from .models import Post, Comment, Like,Reply
-from user.serializers import UserSerializer
-from .serializers import PostSerializer, CommentSerializer, LikeSerializer,ReplySerializer
+from .serializers import PostSerializer, CommentSerializer
 from pollapp.paginators import PollPaginator as Paginator
 import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from datetime import datetime
-
+import requests
+from bs4 import BeautifulSoup
+from pdf2image import convert_from_path
+import cloudinary
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -40,7 +40,6 @@ def get_posts(request):
             post.is_liked = False
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
-    
 
 
 @api_view(['GET'])
@@ -50,7 +49,6 @@ def get_post(request, pk):
     post.is_liked = request.user in post.Liked_by.all()
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
-
 
 
 @api_view(['POST'])
@@ -104,14 +102,14 @@ def delete_post(request, pk):
 def getUserDetails(request):
     user = request.user
     return Response({'user': user.id,
-    'username': user.username,
-    'user_post_count':Post.objects.filter(created_by=user).count(),
-    'user_poll_count':Poll.objects.filter(created_by=user).count(),
-    # 'user_posts':Post.objects.filter(created_by=user).order_by('-created_at')[:5].values_list('id',flat=True)
-    'first_name': user.first_name,
-    'last_name': user.last_name,
-    'user_image': user.image ,
-    })
+                     'username': user.username,
+                     'user_post_count': Post.objects.filter(created_by=user).count(),
+                     'user_poll_count': Poll.objects.filter(created_by=user).count(),
+                     # 'user_posts':Post.objects.filter(created_by=user).order_by('-created_at')[:5].values_list('id',flat=True)
+                     'first_name': user.first_name,
+                     'last_name': user.last_name,
+                     'user_image': user.image,
+                     })
 
 
 @api_view(['GET'])
@@ -120,7 +118,6 @@ def get_posts_count(request):
     posts = Post.objects.all()
     count = posts.count()
     return Response({'count': count})
-
 
 
 @api_view(['POST'])
@@ -177,18 +174,21 @@ def get_comments(request):
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
-            comments = Comment.objects.filter(post=post).order_by('-created_at')
+            comments = Comment.objects.filter(
+                post=post).order_by('-created_at')
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
-            comments = Comment.objects.filter(poll=poll).order_by('-created_at')
+            comments = Comment.objects.filter(
+                poll=poll).order_by('-created_at')
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
             serializer = CommentSerializer(comment, many=False)
             return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -210,7 +210,6 @@ def update_comment(request):
             return Response(serializer.data)
 
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_comment(request):
@@ -227,14 +226,13 @@ def delete_comment(request):
             return Response({'Reply Deleted'}, status=status.HTTP_200_OK)
 
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def put_like(request):
     data = request.data
     post_id = data.get('post_id')
     poll_id = data.get('poll_id')
-    if post_id or poll_id :
+    if post_id or poll_id:
         if post_id:
             post = Post.objects.get(id=post_id)
             like = Like.objects.filter(post=post, created_by=request.user)
@@ -243,7 +241,7 @@ def put_like(request):
                 post.like_count -= 1
                 post.Liked_by.remove(request.user)
                 post.save()
-                return Response({'message': 'Like Removed','is_liked': False})
+                return Response({'message': 'Like Removed', 'is_liked': False})
             else:
                 like = Like.objects.create(
                     post=post,
@@ -253,7 +251,7 @@ def put_like(request):
                 post.like_count += 1
                 post.Liked_by.add(request.user)
                 post.save()
-                return Response({'message': 'Like Added','is_liked': True},status=status.HTTP_201_CREATED)
+                return Response({'message': 'Like Added', 'is_liked': True}, status=status.HTTP_201_CREATED)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             like = Like.objects.filter(poll=poll, created_by=request.user)
@@ -262,7 +260,7 @@ def put_like(request):
                 poll.like_count -= 1
                 poll.liked_by.remove(request.user)
                 poll.save()
-                return Response({'message': 'Like Removed','is_liked': False})
+                return Response({'message': 'Like Removed', 'is_liked': False})
             else:
                 like = Like.objects.create(
                     poll=poll,
@@ -272,5 +270,76 @@ def put_like(request):
                 poll.like_count += 1
                 poll.liked_by.add(request.user)
                 poll.save()
-                return Response({'message': 'Like Added','is_liked': True})
-        
+                return Response({'message': 'Like Added', 'is_liked': True})
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_pdf_post(request):
+    
+    response = requests.get("http://jmicoe.in/")
+    soup = BeautifulSoup(response.content, "html.parser")
+
+
+    pdf_links = soup.find_all("a", {"href": lambda x: x.endswith(".pdf")})
+
+   
+    pdf_list = []
+    for link in pdf_links:
+        pdf_list.append(link.get("href"))
+
+    folder_name = "pdfs"
+    if not os.path.exists(folder_name):
+       os.makedirs(folder_name)
+
+    for pdf in pdf_list:
+        pdf_name = pdf.split("/")[-1]
+        if os.path.exists(f"{folder_name}/{pdf_name}"):
+            pass
+    #if pdf name exist in log.txt then skip that pdf all files in log.txt are seperated by /n in log.txt
+
+
+    for pdf in pdf_list:
+        pdf_name = pdf.split("/")[-1]
+
+        r = requests.get(pdf, stream=True)
+        with open(f"{folder_name}/{pdf_name}", 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+
+
+    for pdf in pdf_list:
+        pdf_name = pdf.split("/")[-1]
+        pdf_path = f"{folder_name}/{pdf_name}"
+        pages = convert_from_path(pdf_path, 500)
+        for page in pages:
+            image_name = pdf_name.split(".")[0]
+            page.save(f"pdfs/{image_name}.jpg", 'JPEG')
+
+        os.remove(pdf_path)
+
+
+    for image in os.listdir("pdfs"):
+        if image.endswith(".jpg"):
+            image_path = f"pdfs/{image}"
+            image_name = image.split(".")[0]
+            upload_result = cloudinary.uploader.upload(image_path)
+            post = Post.objects.create(
+                title=image_name,
+                content=image_name,
+                created_by=Users.objects.get(id=1),
+                post_image=".",
+                created_at=datetime.now()
+            )
+           
+           
+            with open("pdfs/log.txt", "a") as f:
+                f.write(f"{image_name}\n")
+
+            
+            os.remove(image_path)
+
+    return Response({'message': 'Post Created'}, status=status.HTTP_201_CREATED)
+

@@ -173,25 +173,25 @@ WSGI_APPLICATION = 'dicussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nexusdiscuss',
-        'USER': 'nexusdiscuss',
-        'PASSWORD': 'i7bTSKhaAVB5qUqS7yaG2fc166xYf0Xz',
-        'HOST': 'dpg-ce3mufsgqg4c9hnmc1gg-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
-}
-
-
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'nexusdiscuss',
+#         'USER': 'nexusdiscuss',
+#         'PASSWORD': 'i7bTSKhaAVB5qUqS7yaG2fc166xYf0Xz',
+#         'HOST': 'dpg-ce3mufsgqg4c9hnmc1gg-a.oregon-postgres.render.com',
+#         'PORT': '5432',
 #     }
 # }
+
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # DATABASES = {
 #     'default': { 
@@ -293,7 +293,7 @@ CORS_ORIGIN_WHITELIST = [
 
 
 cloudinary.config(
-cloud_name = 'dyjqmfjwh',
-api_key = '734827844593252',
-api_secret = 'xwnKFgL_I17mAhxpoKIJHQnVumI',
+cloud_name = 'dufvphomq',
+api_key = '365359829586928',
+api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
 )
