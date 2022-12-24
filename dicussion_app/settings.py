@@ -293,7 +293,15 @@ CORS_ORIGIN_WHITELIST = [
 
 
 cloudinary.config(
-cloud_name = 'dufvphomq',
-api_key = '365359829586928',
-api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
+cloud_name = 'dyjqmfjwh',
+api_key = '734827844593252',
+api_secret = 'xwnKFgL_I17mAhxpoKIJHQnVumI',
 )
+
+
+#my
+# cloudinary.config(
+# cloud_name = 'dufvphomq',
+# api_key = '365359829586928',
+# api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
+# )
