@@ -329,7 +329,7 @@ def create_pdf_post(request):
                 title=image_name,
                 content=image_name,
                 created_by=Users.objects.get(id=1),
-                post_image=".",
+                post_image=upload_result['secure_url'],
                 created_at=datetime.now()
             )
            
