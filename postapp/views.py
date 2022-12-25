@@ -15,6 +15,9 @@ import requests
 from bs4 import BeautifulSoup
 from pdf2image import convert_from_path
 import cloudinary
+import subprocess
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -276,6 +279,8 @@ def put_like(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_pdf_post(request):
+    subprocess.run(["apt-get", "-y", "install", "poppler-utils"])
+
     
     response = requests.get("http://jmicoe.in/")
     soup = BeautifulSoup(response.content, "html.parser")
