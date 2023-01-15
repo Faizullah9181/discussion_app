@@ -12,6 +12,7 @@ urlpatterns = [
     path('getUserPosts/<int:pk>/', views.get_user_posts, name="user-posts"),
     path('getpostscount/', views.get_posts_count, name="posts-count"),
     path('like/', views.put_like, name="like"),
+    path('all/', views.get_all_post_poll, name="all-posts"),
     path('pdf/', views.create_pdf_post, name="pdf"),
 
 ]

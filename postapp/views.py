@@ -1,11 +1,12 @@
+from itertools import chain
+from operator import attrgetter
 import os
 from user.models import Users
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll
 from .models import Post, Comment, Like,Reply
-from .serializers import PostSerializer, CommentSerializer
-from pollapp.paginators import PollPaginator as Paginator
+from .serializers import PostSerializer, CommentSerializer,PostPollSerializer,PollOptionSerializer2
 import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -16,9 +17,7 @@ from bs4 import BeautifulSoup
 from pdf2image import convert_from_path
 import cloudinary
 import subprocess
-
-
-
+from rest_framework.pagination import PageNumberPagination
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_posts(request, pk):
@@ -301,7 +300,7 @@ def create_pdf_post(request):
         pdf_name = pdf.split("/")[-1]
         if os.path.exists(f"{folder_name}/{pdf_name}"):
             pass
-    #if pdf name exist in log.txt then skip that pdf all files in log.txt are seperated by /n in log.txt
+    
 
 
     for pdf in pdf_list:
@@ -347,3 +346,32 @@ def create_pdf_post(request):
 
     return Response({'message': 'Post Created'}, status=status.HTTP_201_CREATED)
 
+class MyPagination(PageNumberPagination):
+    page_size = 100
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_post_poll(request):
+    posts = Post.objects.all().order_by('-created_at')
+    polls = Poll.objects.all().order_by('-created_at')
+    for post in posts:
+        if request.user in post.Liked_by.all():
+            post.is_liked = True
+        else:
+            post.is_liked = False
+    for poll in polls:
+        if request.user in poll.liked_by.all():
+            poll.is_liked = True
+        else:
+            poll.is_liked = False
+    all_post_poll = list(chain(posts, polls))
+    all_post_poll.sort(key=lambda x: x.created_at, reverse=True)
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(all_post_poll, request)
+    serializer = PostPollSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
+    
+    
+    
