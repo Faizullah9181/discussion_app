@@ -220,8 +220,9 @@ def update_comment(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_comment(request):
-    comment_id = request.POST.get('comment_id')
-    reply_id = request.POST.get('child_comment_id')
+    data = request.data
+    comment_id = data.get('comment_id')
+    reply_id = data.get('child_comment_id')
     if comment_id or reply_id:
         if comment_id:
             comment = Comment.objects.get(id=comment_id)
