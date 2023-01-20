@@ -127,9 +127,10 @@ def get_posts_count(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_comment(request):
-    post_id = request.POST.get('post_id')
-    poll_id = request.POST.get('poll_id')
-    comment_id = request.POST.get('comment_id')
+    data = request.data
+    post_id = data.get('post_id')
+    poll_id = data.get('poll_id')
+    comment_id = data.get('comment_id')
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
@@ -172,9 +173,10 @@ def create_comment(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_comments(request):
-    post_id = request.POST.get('post_id')
-    poll_id = request.POST.get('poll_id')
-    comment_id = request.POST.get('comment_id')
+    data = request.data
+    post_id = data.get('post_id')
+    poll_id = data.get('poll_id')
+    comment_id = data.get('comment_id')
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
@@ -197,8 +199,9 @@ def get_comments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_comment(request):
-    comment_id = request.POST.get('comment_id')
-    reply_id = request.POST.get('child_comment_id')
+    data = request.data
+    comment_id = data.get('comment_id')
+    reply_id = data.get('child_comment_id')
     if comment_id or reply_id:
         if comment_id:
             comment = Comment.objects.get(id=comment_id)
