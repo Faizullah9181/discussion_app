@@ -12,7 +12,5 @@
             "src": "/(.*)",
             "dest": "discussion_app/wsgi.py"
         }
-
-
     ]
 }
