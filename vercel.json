@@ -1,0 +1,29 @@
+{
+    "builds": [
+        {
+            "src": "discussion_app/wsgi.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "15mb",
+                "runtime": "3.9"
+            }
+        }
+    ],
+    "src": [
+        {
+            "src": "build.sh",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "staticfiles"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "discussion_app/wsgi.py"
+        }
+
+
+    ]
+}
