@@ -32,17 +32,12 @@ class Comment(models.Model):
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     post = models.ForeignKey(Post, related_name='post', on_delete=models.CASCADE, null=True)
     poll = models.ForeignKey(Poll, related_name='poll', on_delete=models.CASCADE, null=True)
-    like_count = models.IntegerField(blank=True, default=0)
     reply_count = models.IntegerField(blank=True, default=0)
-    reply = models.JSONField(null=True, blank=True)
+    parent_id = models.ForeignKey('self', related_name='childrens', on_delete=models.CASCADE, null=True, blank=True)
+    replies = models.ManyToManyField('self', related_name='parent', symmetrical=False, blank=True)
 
-class Reply(models.Model):
-    content = models.TextField(null=True, blank=True, max_length=2000)
-    created_at = models.DateTimeField(null=True, blank=True)
-    created_by = models.ForeignKey(Users, related_name='reply_creator', on_delete=models.SET_NULL, null=True)
-    last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
-    comment = models.ForeignKey(Comment, related_name='comment', on_delete=models.CASCADE, null=True)
-    like_count = models.IntegerField(blank=True, default=0)
+
+
 
 
 class Like(models.Model):

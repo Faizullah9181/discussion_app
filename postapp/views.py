@@ -5,7 +5,7 @@ from user.models import Users
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll
-from .models import Post, Comment, Like,Reply
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer,PostPollSerializer,PollOptionSerializer2
 import datetime
 from rest_framework.decorators import api_view, permission_classes
@@ -157,17 +157,21 @@ def create_comment(request):
             serializer = CommentSerializer(comment, many=False)
             return Response(serializer.data)
         elif comment_id:
-            comment = Comment.objects.get(id=comment_id)
-            reply = Reply.objects.create(
-                comment=comment,
+            comment_id = Comment.objects.get(id=comment_id)
+            comment = Comment.objects.create(
+                parent_id=comment_id,
                 created_by=request.user,
                 content=request.data['content'],
                 created_at=datetime.now()
             )
-            comment.reply_count += 1
-            comment.save()
+            comment_id.reply_count += 1
+            comment_id.replies.add(comment)
+            comment_id.save()
             serializer = CommentSerializer(comment, many=False)
             return Response(serializer.data)
+    else:
+        return Response({'detail': 'Post or poll or comment id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
@@ -180,20 +184,20 @@ def get_comments(request):
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
-            comments = Comment.objects.filter(
-                post=post).order_by('-created_at')
+            comments = Comment.objects.filter(post=post)
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
-            comments = Comment.objects.filter(
-                poll=poll).order_by('-created_at')
+            comments = Comment.objects.filter(poll=poll)
             serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
         elif comment_id:
-            comment = Comment.objects.get(id=comment_id)
-            serializer = CommentSerializer(comment, many=False)
+            parent_id = Comment.objects.get(id=comment_id)
+            comments = Comment.objects.filter(parent_id=parent_id)
+            serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data)
+            
 
 
 @api_view(['POST'])
@@ -201,20 +205,13 @@ def get_comments(request):
 def update_comment(request):
     data = request.data
     comment_id = data.get('comment_id')
-    reply_id = data.get('child_comment_id')
-    if comment_id or reply_id:
-        if comment_id:
-            comment = Comment.objects.get(id=comment_id)
-            comment.content = request.data['content']
-            comment.save()
-            serializer = CommentSerializer(comment, many=False)
-            return Response(serializer.data)
-        elif reply_id:
-            reply = Reply.objects.get(id=reply_id)
-            reply.content = request.data['content']
-            reply.save()
-            serializer = CommentSerializer(reply, many=False)
-            return Response(serializer.data)
+    if request.user != Comment.objects.get(id=comment_id).created_by:
+        return Response({'detail': 'Not authorized to update this comment'}, status=status.HTTP_400_BAD_REQUEST)
+    comment = Comment.objects.get(id=comment_id)
+    comment.content = data['content']
+    comment.save()
+    serializer = CommentSerializer(comment, many=False)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -222,16 +219,12 @@ def update_comment(request):
 def delete_comment(request):
     data = request.data
     comment_id = data.get('comment_id')
-    reply_id = data.get('child_comment_id')
-    if comment_id or reply_id:
-        if comment_id:
-            comment = Comment.objects.get(id=comment_id)
-            comment.delete()
-            return Response({'Comment Deleted'}, status=status.HTTP_200_OK)
-        elif reply_id:
-            reply = Reply.objects.get(id=reply_id)
-            reply.delete()
-            return Response({'Reply Deleted'}, status=status.HTTP_200_OK)
+    comment = Comment.objects.get(id=comment_id)
+    if request.user != comment.created_by:
+        return Response({'detail': 'Not authorized to delete this comment'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        comment.delete()
+        return Response({'detail': 'Comment deleted'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
