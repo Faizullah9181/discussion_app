@@ -30,25 +30,33 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
-    replies  = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    
+
     class Meta:
         model = Comment
-        fields = ('id', 'content', 'created_at', 'created_by',
-                  'last_modified_at', 'reply_count', 'parent_id','replies')
+        fields = ('id', 'content', 'created_at', 'created_by', 'is_liked', 'like_count',
+                  'last_modified_at', 'reply_count', 'parent_id', 'replies' )
+
+    def get_is_liked(self, obj):
+        user_id = self.context.get("request")
+        if obj.id:
+            return Comment.Liked_by.through.objects.filter(comment_id=obj.id, users_id=user_id).exists()
+        else:
+            return Comment.Liked_by.through.objects.filter(comment_id=obj.id, users_id=user_id).exists()
+    
+ 
+    
+    
+
 
     def get_replies(self, obj):
         replies = Comment.objects.filter(parent_id=obj.id).order_by('-id')
-        serializer = CommentSerializer(replies, many=True)
+        serializer = CommentSerializer(replies, many=True, context=self.context)
         return serializer.data
 
-
-
-
-        
-        
-
-        
-
+    
 
 class EmptyArrayField(serializers.Field):
     def to_representation(self, value):
