@@ -32,10 +32,14 @@ class Comment(models.Model):
     last_modified_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     post = models.ForeignKey(Post, related_name='post', on_delete=models.CASCADE, null=True)
     poll = models.ForeignKey(Poll, related_name='poll', on_delete=models.CASCADE, null=True)
+    like_count = models.IntegerField(blank=True, default=0)
     reply_count = models.IntegerField(blank=True, default=0)
     parent_id = models.ForeignKey('self', related_name='childrens', on_delete=models.CASCADE, null=True, blank=True)
     replies = models.ManyToManyField('self', related_name='parent', symmetrical=False, blank=True)
+    Liked_by = models.ManyToManyField(Users, related_name='liked_by_comment')
+    is_liked = models.BooleanField(default=False)
 
+    
 
 
 
