@@ -173,36 +173,26 @@ WSGI_APPLICATION = 'discussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'nexusdiscuss_6snf',
-#         'USER': 'nexusdiscuss_6snf_user',
-#         'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
-#         'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
-#         'PORT': '5432',
-#     }
-# }
-
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nexusdiscuss_6snf',
+        'USER': 'nexusdiscuss_6snf_user',
+        'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
+        'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
+        'PORT': '5432',
     }
 }
 
+
+
 # DATABASES = {
-#     'default': { 
-#     'ENGINE': 'django.db.backends.postgresql',
-#     'NAME': 'dep53goum3pb4v',
-#     'USER': 'nkgtkqyfcgnbbi',
-#     'PASSWORD': 'c15e9613899a6523eb55988a6685e6ea85c33b0f6de6ab937347fa2dc501a932',
-#     'HOST': 'ec2-3-208-79-113.compute-1.amazonaws.com',
-#     'PORT': '5432', 
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
+
 
 
 # Password validation
