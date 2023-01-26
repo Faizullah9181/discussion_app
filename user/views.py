@@ -20,10 +20,14 @@ import cloudinary.uploader as uploader
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
+        fcm_token = self.context['request'].data.get('fcm_token', None)
+        if fcm_token is not None:
+            self.user.fcm_token = fcm_token
+            self.user.save()
         serializer = UserSerializerWithToken(self.user).data
         for k, v in serializer.items():
             data[k] = v
-
+        print(data)
         return data
 
 

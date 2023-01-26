@@ -25,10 +25,9 @@ class UserSerializerWithToken(UserSerializer):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
 
-    def create(self, validated_data):
-        user = super().create(validated_data)
-        fcm_token = validated_data.get('fcm_token', None)
-        if fcm_token:
-            user.fcm_token = fcm_token
-            user.save()
-        return user
+    def get_fcm_token(self, obj):
+        fcm_token = self.validated_data.get('fcm_token', None)
+        if fcm_token is not None:
+            obj.fcm_token = fcm_token
+            obj.save()
+        return fcm_token
