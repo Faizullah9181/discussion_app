@@ -1,17 +1,15 @@
 from rest_framework import serializers
-from .models import Post, Comment, Like, UserDetails
+from .models import Post, Comment, Like, UserDetails,Notifications
 from pollapp.models import Poll, PollOption
 from datetime import datetime
 from user.models import Users
 from django.db.models import Q
 from user.serializers import UserSerializer
 
-
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ['id', 'username', 'image']
-
 
 class PostSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
@@ -21,19 +19,16 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 'views',
                   'allow_comments', 'is_liked', 'comment_count', 'like_count']
 
-
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = "__all__"
-
 
 class CommentSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     replies = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     
-
     class Meta:
         model = Comment
         fields = ('id', 'content', 'created_at', 'created_by', 'is_liked', 'like_count',
@@ -46,17 +41,11 @@ class CommentSerializer(serializers.ModelSerializer):
         else:
             return Comment.Liked_by.through.objects.filter(comment_id=obj.id, users_id=user_id).exists()
     
- 
-    
-    
-
-
     def get_replies(self, obj):
         replies = Comment.objects.filter(parent_id=obj.id).order_by('-id')
         serializer = CommentSerializer(replies, many=True, context=self.context)
         return serializer.data
 
-    
 
 class EmptyArrayField(serializers.Field):
     def to_representation(self, value):
@@ -144,3 +133,13 @@ class PostPollSerializer2(serializers.ModelSerializer):
             return super().to_representation(instance)
         elif isinstance(instance, Poll):
             return PollSerializer2(instance).data
+
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+    
+
+    class Meta:
+        model = Notifications
+        fields = ['id', 'created_by', 'created_at', 'is_read', 'type','post','poll','comment']

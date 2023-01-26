@@ -5,8 +5,8 @@ from user.models import Users
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll
-from .models import Post, Comment, Like
-from .serializers import PostSerializer, CommentSerializer, PostPollSerializer, PollOptionSerializer2
+from .models import Post, Comment, Like, Notifications
+from .serializers import PostSerializer, CommentSerializer, PostPollSerializer, PollOptionSerializer2, NotificationSerializer
 import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -19,6 +19,7 @@ import cloudinary
 import subprocess
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from .utils import send_noti_comments
 
 
 @api_view(['GET'])
@@ -65,7 +66,7 @@ def create_post(request):
         content=data['content'],
         created_by=request.user,
         post_image=data['post_image'],
-        created_at=datetime.now(),
+        created_at=datetime.now(),  # type: ignore
         allow_comments=data['allow_comments']
     )
     serializer = PostSerializer(post, many=False)
@@ -85,7 +86,7 @@ def update_post(request, pk):
     post.post_image = data['post_image']
     post.last_modified_by = request.user
     post.is_liked = request.user in post.Liked_by.all()
-    post.last_modified_at = datetime.now()
+    post.last_modified_at = datetime.now()  # type: ignore
     post.allow_comments = data['allow_comments']
     post.save()
     serializer = PostSerializer(post, many=False)
@@ -135,15 +136,26 @@ def create_comment(request):
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
+            post_owner = post.created_by
+            post_owner_fcm_token = post_owner.fcm_token
             comment = Comment.objects.create(
                 post=post,
                 created_by=request.user,
                 content=request.data['content'],
-                created_at=datetime.now()
+                created_at=datetime.now()  # type: ignore
             )
             post.comment_count += 1
             post.save()
             serializer = CommentSerializer(comment, many=False)
+            notification = Notifications.objects.create(
+                type='comment',
+                created_at=datetime.now(),  # type: ignore
+                created_by=request.user,
+                post=post,
+            )
+            notification.save()
+            notification.users.add(post.created_by)
+            send_noti_comments(post, comment , post_owner_fcm_token)
             return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
@@ -151,11 +163,20 @@ def create_comment(request):
                 poll=poll,
                 created_by=request.user,
                 content=request.data['content'],
-                created_at=datetime.now()
+                created_at=datetime.now()  # type: ignore
             )
             poll.comment_count += 1
             poll.save()
             serializer = CommentSerializer(comment, many=False)
+            notification = Notifications.objects.create(
+                type='comment',
+                created_at=datetime.now(),  # type: ignore
+                created_by=request.user,
+                poll=poll,
+            )
+            notification.save()
+            notification.users.add(poll.created_by)
+            send_noti_comments(poll, comment)
             return Response(serializer.data)
         elif comment_id:
             comment_id = Comment.objects.get(id=comment_id)
@@ -163,15 +184,25 @@ def create_comment(request):
                 parent_id=comment_id,
                 created_by=request.user,
                 content=request.data['content'],
-                created_at=datetime.now()
+                created_at=datetime.now()  # type: ignore
             )
             comment_id.reply_count += 1
             comment_id.replies.add(comment)
             comment_id.save()
             serializer = CommentSerializer(comment, many=False)
+            notification = Notifications.objects.create(
+                type='comment',
+                created_at=datetime.now(),  # type: ignore
+                created_by=request.user,
+                comment=comment,
+            )
+            notification.save()
+            notification.users.add(comment_id.created_by)
+            send_noti_comments(comment_id, comment)
             return Response(serializer.data)
     else:
         return Response({'detail': 'Post or poll or comment id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -184,19 +215,24 @@ def get_comments(request):
     if post_id or poll_id or comment_id:
         if post_id:
             post = Post.objects.get(id=post_id)
-            comments = Comment.objects.filter(post=post).order_by('-created_at')
+            comments = Comment.objects.filter(
+                post=post).order_by('-created_at')
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
-            comments = Comment.objects.filter(poll=poll).order_by('-created_at')
-            serializer = CommentSerializer(comments, many=True , context={'request': user_id})
+            comments = Comment.objects.filter(
+                poll=poll).order_by('-created_at')
+            serializer = CommentSerializer(
+                comments, many=True, context={'request': user_id})
             return Response(serializer.data)
         elif comment_id:
             parent_id = Comment.objects.get(id=comment_id)
-            comments = Comment.objects.filter(parent_id=parent_id).order_by('-created_at')
-            serializer = CommentSerializer(comments, many=True , context={'request': user_id})
+            comments = Comment.objects.filter(
+                parent_id=parent_id).order_by('-created_at')
+            serializer = CommentSerializer(
+                comments, many=True, context={'request': user_id})
             return Response(serializer.data)
 
 
@@ -256,7 +292,7 @@ def put_like(request):
                 like = Like.objects.create(
                     post=post,
                     created_by=request.user,
-                    created_at=datetime.now()
+                    created_at=datetime.now()  # type: ignore
                 )
                 post.like_count += 1
                 post.Liked_by.add(request.user)
@@ -275,7 +311,7 @@ def put_like(request):
                 like = Like.objects.create(
                     poll=poll,
                     created_by=request.user,
-                    created_at=datetime.now()
+                    created_at=datetime.now()  # type: ignore
                 )
                 poll.like_count += 1
                 poll.liked_by.add(request.user)
@@ -295,7 +331,7 @@ def put_like(request):
                 like = Like.objects.create(
                     comment=comment,
                     created_by=request.user,
-                    created_at=datetime.now()
+                    created_at=datetime.now()  # type: ignore
                 )
                 comment.like_count += 1
                 comment.Liked_by.add(request.user)
@@ -348,13 +384,14 @@ def create_pdf_post(request):
         if image.endswith(".jpg"):
             image_path = f"pdfs/{image}"
             image_name = image.split(".")[0]
-            upload_result = cloudinary.uploader.upload(image_path)
+            upload_result = cloudinary.uploader.upload(   # type: ignore
+                image_path)
             post = Post.objects.create(
                 title=image_name,
                 content=image_name,
                 created_by=Users.objects.get(id=1),
                 post_image=upload_result['secure_url'],
-                created_at=datetime.now()
+                created_at=datetime.now()  # type: ignore
             )
 
             with open("pdfs/log.txt", "a") as f:
@@ -384,8 +421,18 @@ def get_all_post_poll(request):
         else:
             poll.is_liked = False
     all_post_poll = list(chain(posts, polls))
-    all_post_poll.sort(key=lambda x: x.created_at, reverse=True)
+    all_post_poll.sort(key=lambda x: x.created_at,    # type: ignore
+                       reverse=True)
     paginator = MyPagination()
     result_page = paginator.paginate_queryset(all_post_poll, request)
     serializer = PostPollSerializer(result_page, many=True)
     return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
+def get_notifications(request):
+    user = request.user
+    notifications = Notifications.objects.filter(
+        Q(user_id=user)).order_by('-created_at')
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)

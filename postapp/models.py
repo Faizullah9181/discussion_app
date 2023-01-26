@@ -39,11 +39,6 @@ class Comment(models.Model):
     Liked_by = models.ManyToManyField(Users, related_name='liked_by_comment')
     is_liked = models.BooleanField(default=False)
 
-    
-
-
-
-
 class Like(models.Model):
     post = models.ForeignKey(Post, related_name='post_likes', on_delete=models.SET_NULL, null=True, blank=True)
     poll = models.ForeignKey(Poll, related_name='poll_likes', on_delete=models.SET_NULL, null=True, blank=True)
@@ -69,6 +64,23 @@ class UserDetails(models.Model):
 
     class Meta:
         ordering = ["-username"]
+
+
+class Notifications(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
+    type = models.CharField(null=False, blank=False, max_length=200)
+    post = models.ForeignKey(Post, related_name='post_notification', on_delete=models.CASCADE, null=True, blank=True)
+    poll = models.ForeignKey(Poll, related_name='poll_notification', on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.ForeignKey(Comment, related_name='comment_notification', on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(Users, related_name='notification_creator', on_delete=models.SET_NULL, null=True)
+    is_read = models.BooleanField(default=False)
+    users = models.ManyToManyField(Users, related_name='users', blank=True)
+
+    
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 

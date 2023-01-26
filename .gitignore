@@ -5,3 +5,5 @@
 db.sqlite3
 ./myenv
 __pycache__/manage.cpython-39.pyc
+.env
+postapp/credentials.json
