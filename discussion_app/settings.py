@@ -13,9 +13,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from datetime import timedelta
 import cloudinary
-import environ
+# import environ
 
-env = environ.Env()
+# env = environ.Env()
 
 
 
@@ -299,4 +299,4 @@ api_key = '365359829586928',
 api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
 )
 
-GOOGLE_APPLICATION_CREDENTIALS = env.str('GOOGLE_APPLICATION_CREDENTIALS')
+# GOOGLE_APPLICATION_CREDENTIALS = env.str('GOOGLE_APPLICATION_CREDENTIALS')
