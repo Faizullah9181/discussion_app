@@ -58,6 +58,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=500, blank=True)
     gender =models.CharField(max_length=10,blank=True,default='Male')
     dob = models.DateField(null=True, blank=False)
+    fcm_token = models.CharField(max_length=255, blank=True)
     last_modified = models.DateTimeField(auto_now_add=True)
     is_profile_complete = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

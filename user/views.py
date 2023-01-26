@@ -34,13 +34,15 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @api_view(['POST'])
 def registerUser(request):
     if request.method == 'POST':
-        serializer = UserSerializer(data=request.data)
+        fcm_token = request.data.get('fcm_token', None)
+        serializer = UserSerializerWithToken(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(str(user.password))
             user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])

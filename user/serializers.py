@@ -15,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
+    fcm_token = serializers.CharField(required=False)
 
     class Meta:
         model = Users
@@ -23,3 +24,11 @@ class UserSerializerWithToken(UserSerializer):
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        fcm_token = validated_data.get('fcm_token', None)
+        if fcm_token:
+            user.fcm_token = fcm_token
+            user.save()
+        return user

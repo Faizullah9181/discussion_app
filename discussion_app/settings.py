@@ -11,10 +11,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
 from datetime import timedelta
-
 import cloudinary
+import environ
+
+env = environ.Env()
+
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -195,6 +197,7 @@ DATABASES = {
 
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -295,3 +298,5 @@ cloud_name = 'dufvphomq',
 api_key = '365359829586928',
 api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
 )
+
+GOOGLE_APPLICATION_CREDENTIALS = env.str('GOOGLE_APPLICATION_CREDENTIALS')
