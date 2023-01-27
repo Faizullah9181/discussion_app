@@ -19,7 +19,7 @@ import cloudinary
 import subprocess
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-from .utils import send_noti_comments
+from .utils import *
 
 
 @api_view(['GET'])
@@ -137,7 +137,7 @@ def create_comment(request):
         if post_id:
             post = Post.objects.get(id=post_id)
             post_owner = post.created_by
-            post_owner_fcm_token = post_owner.fcm_token
+            post_owner_fcm_token = post_owner.fcm_token  # type: ignore
             comment = Comment.objects.create(
                 post=post,
                 created_by=request.user,
@@ -147,18 +147,23 @@ def create_comment(request):
             post.comment_count += 1
             post.save()
             serializer = CommentSerializer(comment, many=False)
-            notification = Notifications.objects.create(
+            if post_owner == comment.created_by:
+                return Response(serializer.data)
+            else:
+                notification = Notifications.objects.create(
                 type='comment',
                 created_at=datetime.now(),  # type: ignore
                 created_by=request.user,
+                created_for=post_owner,
                 post=post,
             )
-            notification.save()
-            notification.users.add(post.created_by)
-            send_noti_comments(post, comment , post_owner_fcm_token)
-            return Response(serializer.data)
+                notification.save()
+                send_noti_comments_post(post, comment , post_owner_fcm_token)
+                return Response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
+            poll_owner = poll.created_by
+            poll_owner_fcm_token = poll_owner.fcm_token  # type: ignore
             comment = Comment.objects.create(
                 poll=poll,
                 created_by=request.user,
@@ -168,18 +173,23 @@ def create_comment(request):
             poll.comment_count += 1
             poll.save()
             serializer = CommentSerializer(comment, many=False)
-            notification = Notifications.objects.create(
+            if poll_owner == comment.created_by:
+                return Response(serializer.data)
+            else:
+                notification = Notifications.objects.create(
                 type='comment',
                 created_at=datetime.now(),  # type: ignore
                 created_by=request.user,
+                created_for=poll_owner,
                 poll=poll,
             )
-            notification.save()
-            notification.users.add(poll.created_by)
-            send_noti_comments(poll, comment)
-            return Response(serializer.data)
+                notification.save()
+                send_noti_comments_poll(poll, comment, poll_owner_fcm_token)
+                return Response(serializer.data)
         elif comment_id:
             comment_id = Comment.objects.get(id=comment_id)
+            comment_owner = comment_id.created_by
+            comment_owner_fcm_token = comment_owner.fcm_token  # type: ignore
             comment = Comment.objects.create(
                 parent_id=comment_id,
                 created_by=request.user,
@@ -190,16 +200,19 @@ def create_comment(request):
             comment_id.replies.add(comment)
             comment_id.save()
             serializer = CommentSerializer(comment, many=False)
-            notification = Notifications.objects.create(
+            if comment_id.created_by == comment.created_by:
+                return Response(serializer.data)
+            else:
+                notification = Notifications.objects.create(
                 type='comment',
                 created_at=datetime.now(),  # type: ignore
                 created_by=request.user,
+                created_for=comment_id.created_by,
                 comment=comment,
             )
-            notification.save()
-            notification.users.add(comment_id.created_by)
-            send_noti_comments(comment_id, comment)
-            return Response(serializer.data)
+                notification.save()
+                send_noti_commets_comments(comment_id, comment, comment_owner_fcm_token)
+                return Response(serializer.data)
     else:
         return Response({'detail': 'Post or poll or comment id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -282,6 +295,8 @@ def put_like(request):
         if post_id:
             post = Post.objects.get(id=post_id)
             like = Like.objects.filter(post=post, created_by=request.user)
+            post_owner = post.created_by
+            post_owner_fcm_token = post_owner.fcm_token  # type: ignore
             if like:
                 like.delete()
                 post.like_count -= 1
@@ -297,10 +312,24 @@ def put_like(request):
                 post.like_count += 1
                 post.Liked_by.add(request.user)
                 post.save()
-                return Response({'message': 'Like Added', 'is_liked': True}, status=status.HTTP_201_CREATED)
+                if post.created_by == request.user:
+                   return Response({'message': 'Like Added', 'is_liked': True}, status=status.HTTP_201_CREATED)
+                else:
+                    notification = Notifications.objects.create(
+                        type='like',
+                        created_at=datetime.now(),  # type: ignore
+                        created_by=request.user,
+                        created_for=post_owner,
+                        post=post,
+                    )
+                    notification.save()
+                    send_noti_like_post(post, like, post_owner_fcm_token)
+                    return Response({'message': 'Like Added', 'is_liked': True}, status=status.HTTP_201_CREATED) 
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             like = Like.objects.filter(poll=poll, created_by=request.user)
+            poll_owner = poll.created_by
+            poll_owner_fcm_token = poll_owner.fcm_token  # type: ignore
             if like:
                 like.delete()
                 poll.like_count -= 1
@@ -316,11 +345,25 @@ def put_like(request):
                 poll.like_count += 1
                 poll.liked_by.add(request.user)
                 poll.save()
-                return Response({'message': 'Like Added', 'is_liked': True})
+                if poll.created_by == request.user:
+                   return Response({'message': 'Like Added', 'is_liked': True})
+                else:
+                    notification = Notifications.objects.create(
+                        type='like',
+                        created_at=datetime.now(),  # type: ignore
+                        created_by=request.user,
+                        created_for=poll_owner,
+                        poll=poll,
+                    )
+                    notification.save()
+                    send_noti_like_poll(poll, like, poll_owner_fcm_token)
+                    return Response({'message': 'Like Added', 'is_liked': True})
         elif comment_id:
             comment = Comment.objects.get(id=comment_id)
             like = Like.objects.filter(
                 comment=comment, created_by=request.user)
+            comment_owner = comment.created_by
+            comment_owner_fcm_token = comment_owner.fcm_token  # type: ignore
             if like:
                 like.delete()
                 comment.like_count -= 1
@@ -336,7 +379,19 @@ def put_like(request):
                 comment.like_count += 1
                 comment.Liked_by.add(request.user)
                 comment.save()
-                return Response({'message': 'Like Added', 'is_liked': True})
+                if comment.created_by == request.user:
+                   return Response({'message': 'Like Added', 'is_liked': True})
+                else:
+                    notification = Notifications.objects.create(
+                        type='like',
+                        created_at=datetime.now(),  # type: ignore
+                        created_by=request.user,
+                        created_for=comment_owner,
+                        comment=comment,
+                    )
+                    notification.save()
+                    send_noti_like_comments(comment, like, comment_owner_fcm_token)
+                    return Response({'message': 'Like Added', 'is_liked': True})
 
 
 @api_view(['POST'])
@@ -432,7 +487,9 @@ def get_all_post_poll(request):
 @api_view(['GET'])
 def get_notifications(request):
     user = request.user
-    notifications = Notifications.objects.filter(
-        Q(user_id=user)).order_by('-created_at')
+    notifications = Notifications.objects.filter(created_for=user).order_by('-created_at')
     serializer = NotificationSerializer(notifications, many=True)
     return Response(serializer.data)
+
+
+

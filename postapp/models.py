@@ -75,7 +75,7 @@ class Notifications(models.Model):
     created_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(Users, related_name='notification_creator', on_delete=models.SET_NULL, null=True)
     is_read = models.BooleanField(default=False)
-    users = models.ManyToManyField(Users, related_name='users', blank=True)
+    created_for = models.ForeignKey(Users, related_name='notification_for', on_delete=models.SET_NULL, null=True)
 
     
 

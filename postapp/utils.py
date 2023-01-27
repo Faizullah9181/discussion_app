@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import messaging
 from firebase_admin import credentials
 from django.conf import settings
+import json
 
 exmp = {
     "type": "service_account",
@@ -20,18 +21,124 @@ cred = credentials.Certificate(exmp)
 firebase_admin.initialize_app(cred)
 
 
-def send_noti_comments(*values):
+def send_noti_comments_post(*values):
 
-    print("1111", values[0])
-    print("2222", values[1].created_by.username)
-
-    title = f"{values[1].created_by.username} commented on your post {values[0].title}."
+    print("1111",values[0])
+    print("2222",values[1])
+    print("3333",values[2])
 
     message = messaging.Message(
-        notification=messaging.Notification(
-            title= title,
-        ),
-        token= values[2]
+        data={
+            "created_by": str({
+                "id": (values[1].created_by.id),
+                "username": (values[1].created_by.username),
+                "image": (values[1].created_by.image)
+            }),
+            "type": "comment",
+            "post":  str(values[1].post.id),
+
+        },
+        token=values[2]
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
+
+
+def send_noti_comments_poll(*values):
+
+    message = messaging.Message(
+        data={
+
+            "created_by": str({
+                "id": (values[1].created_by.id),
+                "username": (values[1].created_by.username),
+                "image": (values[1].created_by.image)
+            }),
+            "type": "comment",
+            "poll":  str(values[1].poll.id),
+        },
+
+        token=values[2]
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
+
+
+def send_noti_commets_comments(*values):
+    data = {
+
+        "created_by": str({
+            "id": (values[1].created_by.id),
+            "username": (values[1].created_by.username),
+            "image": (values[1].created_by.image)
+        }),
+        "type": "comment",
+        "comment":  str(values[1].comment.id),
+    }
+
+    message = messaging.Message(
+        data={
+            "data": json.dumps(data)
+        },
+
+        token=values[2]
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
+
+
+def send_noti_like_post(*values):
+
+    print("1111",values[0])
+    print("2222",values[1])
+    print("3333",values[2])
+
+    message = messaging.Message(
+        data={
+            "created_by": str({
+                "id": (values[1].created_by.id),
+                "username": (values[1].created_by.username),
+                "image": (values[1].created_by.image)
+            }),
+            "type": "like",
+            "post":  str(values[1].post.id),
+        },
+        token=values[2]
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
+
+
+
+def send_noti_like_poll(*values):
+    message = messaging.Message(
+        data={
+            "created_by": str({
+                "id": (values[1].created_by.id),
+                "username": (values[1].created_by.username),
+                "image": (values[1].created_by.image)
+            }),
+            "type": "like",
+            "poll":  str(values[1].poll.id),
+        },
+        token=values[2]
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
+
+
+def send_noti_like_comments(*values):
+    message = messaging.Message(
+        data={
+            "created_by": str({
+                "id": (values[1].created_by.id),
+                "username": (values[1].created_by.username),
+                "image": (values[1].created_by.image)
+            }),
+            "type": "like",
+            "comment":  str(values[1].comment.id),
+        },
+        token=values[2]
     )
     response = messaging.send(message)
     print('Successfully sent message:', response)

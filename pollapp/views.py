@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Poll, PollOption
-from .serializers import PollSerializer , PollSerializer2
+from .serializers import PollSerializer, PollSerializer2
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -18,6 +18,7 @@ from datetime import datetime
 import json
 from django.http import JsonResponse
 
+
 def is_voted(poll, user):
     poll_options = PollOption.objects.filter(poll=poll)
     for poll_option in poll_options:
@@ -25,10 +26,6 @@ def is_voted(poll, user):
             return True
     return False
 
-
-
-
-    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -43,7 +40,7 @@ def create_poll(request):
         last_modified_by=user,
         last_modified_at=datetime.now(),
         allow_comments=data['allow_comments'],
-        private = data['private']
+        private=data['private']
     )
     poll.save()
     for i in range(1, 7):
@@ -55,6 +52,7 @@ def create_poll(request):
             poll_option.save()
     serializer = PollSerializer(poll)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -86,8 +84,7 @@ def get_user_polls(request):
     serializer = PollSerializer(polls, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
-    
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete_poll(request, poll_id):
@@ -99,6 +96,7 @@ def delete_poll(request, poll_id):
     else:
         return Response({'message': 'You are not authorized to delete this poll'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_polls(request):
@@ -108,17 +106,20 @@ def get_all_polls(request):
     p = []
     for poll in polls:
         if poll.created_by != user and poll.private == True:
-            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            poll.is_voted = poll_options.filter(
+                voted_by=user, poll=poll).exists()
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PollSerializer2(poll)
             p.append(serializer.data)
         elif poll.created_by == user:
-            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            poll.is_voted = poll_options.filter(
+                voted_by=user, poll=poll).exists()
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PollSerializer(poll)
             p.append(serializer.data)
         elif poll.private == False:
-            poll.is_voted = poll_options.filter(voted_by=user, poll=poll).exists()
+            poll.is_voted = poll_options.filter(
+                voted_by=user, poll=poll).exists()
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PollSerializer(poll)
             p.append(serializer.data)
@@ -149,6 +150,7 @@ def get_all_polls(request):
 #             serializer = PollSerializer(poll)
 #             p.append(serializer.data)
 #     return Response(p, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

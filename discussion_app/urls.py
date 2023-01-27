@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/users/', include('user.urls')),
     path('api/post/', include('postapp.urls')),
     path('api/poll/', include('pollapp.urls')),
-    path('api/comment/', include('postapp.urlss')),
+    path('api/comment/', include('postapp.url.comments_url')),
+    path('api/notification/', include('postapp.url.notification_url')),
     path('accounts/', include('allauth.urls')),
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
