@@ -491,5 +491,11 @@ def get_notifications(request):
     serializer = NotificationSerializer(notifications, many=True)
     return Response(serializer.data)
 
-
+@api_view(['POST'])
+def notification_read(request):
+    notification_id = request.data.get('notification_id')
+    notification = Notifications.objects.get(id=notification_id)
+    notification.is_read = True
+    notification.save()
+    return Response({'message': 'Notification Read'})
 

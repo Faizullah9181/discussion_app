@@ -23,10 +23,6 @@ firebase_admin.initialize_app(cred)
 
 def send_noti_comments_post(*values):
 
-    print("1111",values[0])
-    print("2222",values[1])
-    print("3333",values[2])
-
     message = messaging.Message(
         data={
             "created_by": str({
@@ -35,8 +31,12 @@ def send_noti_comments_post(*values):
                 "image": (values[1].created_by.image)
             }),
             "type": "comment",
-            "post":  str(values[1].post.id),
-
+            "post":  str({
+                "id": (values[1].post.id),
+                "title": (values[1].post.title),
+                "image": (values[1].post.post_image),
+                "content": (values[1].content),
+            }),
         },
         token=values[2]
     )
@@ -55,7 +55,11 @@ def send_noti_comments_poll(*values):
                 "image": (values[1].created_by.image)
             }),
             "type": "comment",
-            "poll":  str(values[1].poll.id),
+            "poll":  str({
+                "id": (values[1].poll.id),
+                "title": (values[1].poll.title),
+                "content": (values[1].content),
+            }),
         },
 
         token=values[2]
@@ -73,7 +77,12 @@ def send_noti_commets_comments(*values):
             "image": (values[1].created_by.image)
         }),
         "type": "comment",
-        "comment":  str(values[1].comment.id),
+        "comment":  ({
+            "id": (values[1].id),
+            "content": (values[1].content),
+
+        }),
+
     }
 
     message = messaging.Message(
@@ -89,10 +98,6 @@ def send_noti_commets_comments(*values):
 
 def send_noti_like_post(*values):
 
-    print("1111",values[0])
-    print("2222",values[1])
-    print("3333",values[2])
-
     message = messaging.Message(
         data={
             "created_by": str({
@@ -101,13 +106,16 @@ def send_noti_like_post(*values):
                 "image": (values[1].created_by.image)
             }),
             "type": "like",
-            "post":  str(values[1].post.id),
+            "post": str({
+                "id": (values[1].post.id),
+                "title": (values[1].post.title),
+                "image": (values[1].post.post_image),
+            }),
         },
         token=values[2]
     )
     response = messaging.send(message)
     print('Successfully sent message:', response)
-
 
 
 def send_noti_like_poll(*values):
@@ -119,7 +127,11 @@ def send_noti_like_poll(*values):
                 "image": (values[1].created_by.image)
             }),
             "type": "like",
-            "poll":  str(values[1].poll.id),
+            "poll": str({
+                "id": (values[1].poll.id),
+                "title": (values[1].poll.title),
+
+            })
         },
         token=values[2]
     )
@@ -136,7 +148,10 @@ def send_noti_like_comments(*values):
                 "image": (values[1].created_by.image)
             }),
             "type": "like",
-            "comment":  str(values[1].comment.id),
+            "comment":  str({
+                "id": (values[1].id),
+                "content": (values[1].content),
+            })
         },
         token=values[2]
     )
