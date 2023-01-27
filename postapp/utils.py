@@ -35,6 +35,7 @@ def send_noti_comments_post(*values):
                 "id": (values[1].post.id),
                 "title": (values[1].post.title),
                 "image": (values[1].post.post_image),
+                 "content": (values[1].post.content),
                 "comment": (values[1].content),
             }),
         },
@@ -58,6 +59,7 @@ def send_noti_comments_poll(*values):
             "poll":  str({
                 "id": (values[1].poll.id),
                 "title": (values[1].poll.title),
+                "content": (values[1].poll.content),
                 "comment": (values[1].content),
             }),
         },
@@ -69,9 +71,6 @@ def send_noti_comments_poll(*values):
 
 
 def send_noti_commets_comments(*values):
-    print("1111",values[0].content)
-    print("2222",values[1].content)
-    print("3333",values[2])
     message = messaging.Message(
         data={
             "created_by": str({
