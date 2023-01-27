@@ -146,7 +146,7 @@ def send_noti_like_comments(*values):
             "type": "like",
             "comment":  str({
                 "id": (values[1].id),
-                "content": (values[1].content),
+                "content": (values[0].content),
             })
         },
         token=values[2]
