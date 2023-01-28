@@ -174,28 +174,28 @@ WSGI_APPLICATION = 'discussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'nexusdiscuss_6snf',
-#         'USER': 'nexusdiscuss_6snf_user',
-#         'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
-#         'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django_cockroachdb',
-        'NAME': 'defaultdb',
-        'USER': 'nexus',
-        'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
-        'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
-        'PORT': '26257',
-    },
-
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'nexusdiscuss_6snf',
+        'USER': 'nexusdiscuss_6snf_user',
+        'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
+        'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
+        'PORT': '5432',
+    }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django_cockroachdb',
+#         'NAME': 'defaultdb',
+#         'USER': 'nexus',
+#         'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
+#         'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
+#         'PORT': '26257',
+#     },
+
+# }
 
 
 # DATABASES = {
