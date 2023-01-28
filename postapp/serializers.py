@@ -151,7 +151,7 @@ class PollSerializerForNotifications(serializers.ModelSerializer):
         model = Poll
         fields = ['id', 'title', 'content', 'created_by', 'created_at' ]
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializerForNoti(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
 
     class Meta:
@@ -162,7 +162,7 @@ class NotificationSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     post = PostSerializerForNotifications(required=False)
     poll = PollSerializerForNotifications(required=False)
-    comment = CommentSerializer(required=False)
+    comment = CommentSerializerForNoti(required=False)
 
     class Meta:
         model = Notifications
