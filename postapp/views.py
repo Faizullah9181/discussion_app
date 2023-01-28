@@ -20,6 +20,7 @@ import subprocess
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from .utils import *
+from rest_framework import filters
 
 
 @api_view(['GET'])
@@ -444,7 +445,7 @@ def create_pdf_post(request):
             post = Post.objects.create(
                 title=image_name,
                 content=image_name,
-                created_by=Users.objects.get(id=1),
+                created_by=Users.objects.get(id=4),
                 post_image=upload_result['secure_url'],
                 created_at=datetime.now()  # type: ignore
             )
@@ -458,7 +459,7 @@ def create_pdf_post(request):
 
 
 class MyPagination(PageNumberPagination):
-    page_size = 100
+    page_size = 5
 
 
 @api_view(['GET'])
@@ -485,6 +486,7 @@ def get_all_post_poll(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_notifications(request):
     user = request.user
     notifications = Notifications.objects.filter(created_for=user).order_by('-created_at')
@@ -492,10 +494,13 @@ def get_notifications(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def notification_read(request):
     notification_id = request.data.get('notification_id')
     notification = Notifications.objects.get(id=notification_id)
     notification.is_read = True
     notification.save()
-    return Response({'message': 'Notification Read'})
+    serializer = NotificationSerializer(notification)
+    return Response(serializer.data)
+
 
