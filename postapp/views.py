@@ -503,4 +503,19 @@ def notification_read(request):
     serializer = NotificationSerializer(notification)
     return Response(serializer.data)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def notification_delete(request):
+    notification_id = request.data.get('notification_id')
+    notification = Notifications.objects.get(id=notification_id)
+    notification.delete()
+    return Response({'message': 'Notification Deleted'})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_all_notifications(request):
+    user = request.user
+    notifications = Notifications.objects.filter(created_for=user)
+    notifications.delete()
+    return Response({'message': 'All Notifications Deleted'})
 

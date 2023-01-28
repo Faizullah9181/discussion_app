@@ -18,7 +18,6 @@ import cloudinary
 # env = environ.Env()
 
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -175,17 +174,28 @@ WSGI_APPLICATION = 'discussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'nexusdiscuss_6snf',
+#         'USER': 'nexusdiscuss_6snf_user',
+#         'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
+#         'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nexusdiscuss_6snf',
-        'USER': 'nexusdiscuss_6snf_user',
-        'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
-        'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
-}
+        'ENGINE': 'django_cockroachdb',
+        'NAME': 'defaultdb',
+        'USER': 'nexus',
+        'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
+        'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
+        'PORT': '26257',
+    },
 
+}
 
 
 # DATABASES = {
@@ -194,8 +204,6 @@ DATABASES = {
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
-
-
 
 
 # Password validation
@@ -234,7 +242,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_ROOT= os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -244,7 +252,7 @@ LOGIN_REDIRECT_URL = '/'
 
 
 SOCIALACCOUNT_PROVIDERS = {
-     'google': {
+    'google': {
         'SCOPE': [
             'profile',
             'email',
@@ -255,11 +263,11 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_LOGIN_ON_GET=True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"  #later change to mandatory
+ACCOUNT_EMAIL_VERIFICATION = "none"  # later change to mandatory
 ACCOUNT_SIGNUP_PASSWORD_VERIFICATION = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
@@ -272,17 +280,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '140391069257-be400t89h6fp1ijhm3d7b5gssl5nre0l.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email',
+                                   'https://www.googleapis.com/auth/userinfo.profile', 'openid']
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
 
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
     # 'http://localhost:3000',
 
 ]
-
 
 
 # cloudinary.config(
@@ -292,11 +300,11 @@ CORS_ORIGIN_WHITELIST = [
 # )
 
 
-#my
+# my
 cloudinary.config(
-cloud_name = 'dufvphomq',
-api_key = '365359829586928',
-api_secret = 'UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
+    cloud_name='dufvphomq',
+    api_key='365359829586928',
+    api_secret='UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
 )
 
 # GOOGLE_APPLICATION_CREDENTIALS = env.str('GOOGLE_APPLICATION_CREDENTIALS')

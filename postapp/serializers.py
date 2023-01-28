@@ -136,9 +136,33 @@ class PostPollSerializer2(serializers.ModelSerializer):
 
 
 
+
+class  PostSerializerForNotifications(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', ]
+
+
+
+class PollSerializerForNotifications(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+    class Meta:
+        model = Poll
+        fields = ['id', 'title', 'content', 'created_by', 'created_at' ]
+
+class CommentSerializer(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'content', 'created_at', 'created_by')
+
 class NotificationSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
-    
+    post = PostSerializerForNotifications(required=False)
+    poll = PollSerializerForNotifications(required=False)
+    comment = CommentSerializer(required=False)
 
     class Meta:
         model = Notifications
