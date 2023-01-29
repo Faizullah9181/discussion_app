@@ -179,7 +179,7 @@ class CommentSerializerForNoti(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields =[ 'id', 'content', 'created_at', 'created_by' , 'comment']
+        fields =[ 'id', 'content', 'created_at', 'created_by' , 'comment' , 'poll', 'post']
     
     def get_comment(self, obj):
         notification = Notifications.objects.filter(comment=obj, type='comment').order_by('-id')
@@ -208,6 +208,18 @@ class NotificationSerializer(serializers.ModelSerializer):
             elif instance.comment:
                 data['comment']['comment'] = instance.content
         return data
+
+
+class NotificationSerializer2(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+    post = PostSerializerForNotifications(read_only=True)
+    poll = PollSerializerForNotifications(read_only=True)
+    comment = CommentSerializerForNoti(required=False)
+
+    class Meta:
+        model = Notifications
+        fields = ['id', 'created_by', 'created_at', 'is_read',
+                  'type', 'post', 'poll', 'comment', 'created_for']
 
 
 
