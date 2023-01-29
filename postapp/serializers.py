@@ -1,15 +1,17 @@
 from rest_framework import serializers
-from .models import Post, Comment, Like, UserDetails,Notifications
+from .models import Post, Comment, Like, UserDetails, Notifications
 from pollapp.models import Poll, PollOption
 from datetime import datetime
 from user.models import Users
 from django.db.models import Q
 from user.serializers import UserSerializer
 
+
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = ['id', 'username', 'image']
+
 
 class PostSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
@@ -19,20 +21,22 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 'views',
                   'allow_comments', 'is_liked', 'comment_count', 'like_count']
 
+
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = "__all__"
 
+
 class CommentSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     replies = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Comment
         fields = ('id', 'content', 'created_at', 'created_by', 'is_liked', 'like_count',
-                  'last_modified_at', 'reply_count', 'parent_id', 'replies' )
+                  'last_modified_at', 'reply_count', 'parent_id', 'replies')
 
     def get_is_liked(self, obj):
         user_id = self.context.get("request")
@@ -40,10 +44,11 @@ class CommentSerializer(serializers.ModelSerializer):
             return Comment.Liked_by.through.objects.filter(comment_id=obj.id, users_id=user_id).exists()
         else:
             return Comment.Liked_by.through.objects.filter(comment_id=obj.id, users_id=user_id).exists()
-    
+
     def get_replies(self, obj):
         replies = Comment.objects.filter(parent_id=obj.id).order_by('-id')
-        serializer = CommentSerializer(replies, many=True, context=self.context)
+        serializer = CommentSerializer(
+            replies, many=True, context=self.context)
         return serializer.data
 
 
@@ -104,7 +109,6 @@ class PollSerializer2(serializers.ModelSerializer):
 
 class PostPollSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
-
     poll = PollSerializer(required=False)
 
     class Meta:
@@ -137,19 +141,42 @@ class PostPollSerializer2(serializers.ModelSerializer):
 
 
 
-class  PostSerializerForNotifications(serializers.ModelSerializer):
+
+class PostSerializerForNotifications(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
+    comment = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', ]
+        fields = ['id', 'title', 'content', 'created_by',
+                  'created_at', 'post_image', 'comment']
+
+    
+
+    
+    def get_comment(self, obj):
+      notification = self.context.get("notification")
+      #print("notification", notification)
+      #<QuerySet [<Notifications: Notifications object (133)>, <Notifications: Notifications object (134)>, <Notifications: Notifications object (132)>, <Notifications: Notifications object (112)>]>
+      #print("notification_1", notification[0].content)
+      #notification_1 lololololol
+      noti_content = ""
+      for noti in notification:
+        noti_content = noti.content
+      return noti_content
+
+      
+
 
 
 
 class PollSerializerForNotifications(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_by', 'created_at' ]
+        fields = ['id', 'title', 'content', 'created_by', 'created_at']
+
 
 class CommentSerializerForNoti(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
@@ -157,6 +184,7 @@ class CommentSerializerForNoti(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'content', 'created_at', 'created_by')
+
 
 class NotificationSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
@@ -166,4 +194,5 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notifications
-        fields = ['id', 'created_by', 'created_at', 'is_read', 'type','post','poll','comment','created_for']
+        fields = ['id', 'created_by', 'created_at', 'is_read',
+                  'type', 'post', 'poll', 'comment', 'created_for']

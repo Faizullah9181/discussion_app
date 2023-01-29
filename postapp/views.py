@@ -157,6 +157,8 @@ def create_comment(request):
                 created_by=request.user,
                 created_for=post_owner,
                 post=post,
+                content = request.data['content']
+            
             )
                 notification.save()
                 send_noti_comments_post(post, comment , post_owner_fcm_token)
@@ -183,6 +185,7 @@ def create_comment(request):
                 created_by=request.user,
                 created_for=poll_owner,
                 poll=poll,
+                content = request.data['content']
             )
                 notification.save()
                 send_noti_comments_poll(poll, comment, poll_owner_fcm_token)
@@ -490,8 +493,9 @@ def get_all_post_poll(request):
 def get_notifications(request):
     user = request.user
     notifications = Notifications.objects.filter(created_for=user).order_by('-created_at')
-    serializer = NotificationSerializer(notifications, many=True)
+    serializer = NotificationSerializer(notifications, many=True , context = {'notification': notifications})
     return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

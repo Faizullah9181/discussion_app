@@ -76,7 +76,7 @@ class Notifications(models.Model):
     created_by = models.ForeignKey(Users, related_name='notification_creator', on_delete=models.SET_NULL, null=True)
     is_read = models.BooleanField(default=False)
     created_for = models.ForeignKey(Users, related_name='notification_for', on_delete=models.SET_NULL, null=True)
-
+    content = models.TextField(null=True, blank=True, max_length=2000)
     
 
     class Meta:
