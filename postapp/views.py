@@ -213,6 +213,7 @@ def create_comment(request):
                 created_by=request.user,
                 created_for=comment_owner,
                 comment=comment_id,
+                content = request.data['content']
             )
                 notification.save()
                 send_noti_commets_comments(comment_id, comment, comment_owner_fcm_token)
