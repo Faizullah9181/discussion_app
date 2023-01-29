@@ -149,50 +149,65 @@ class PostSerializerForNotifications(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'created_by',
-                  'created_at', 'post_image', 'comment']
+             'created_at', 'post_image', 'comment']
 
-    
-
-    
     def get_comment(self, obj):
-      notification = self.context.get("notification")
-      #print("notification", notification)
-      #<QuerySet [<Notifications: Notifications object (133)>, <Notifications: Notifications object (134)>, <Notifications: Notifications object (132)>, <Notifications: Notifications object (112)>]>
-      #print("notification_1", notification[0].content)
-      #notification_1 lololololol
-      noti_content = ""
-      for noti in notification:
-        noti_content = noti.content
-      return noti_content
-
-      
-
-
+        notification = Notifications.objects.filter(post=obj, type='comment').order_by('-id')
+        if notification.exists():
+            return notification.first().content
+        return None
 
 
 class PollSerializerForNotifications(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
+    comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_by', 'created_at']
+        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'comment']
+    
+    def get_comment(self, obj):
+        notification = Notifications.objects.filter(poll=obj, type='comment').order_by('-id')
+        if notification.exists():
+            return notification.first().content
+        return None
 
 
 class CommentSerializerForNoti(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
+    child_comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'content', 'created_at', 'created_by')
-
+        fields =[ 'id', 'content', 'created_at', 'created_by' , 'child_comment']
+    
+    def get_child_comment(self, obj):
+        notification = Notifications.objects.filter(comment=obj, type='comment').order_by('-id')
+        if notification.exists():
+            return notification.first().content
+        return None
 
 class NotificationSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
-    post = PostSerializerForNotifications(required=False)
-    poll = PollSerializerForNotifications(required=False)
+    post = PostSerializerForNotifications(read_only=True)
+    poll = PollSerializerForNotifications(read_only=True)
     comment = CommentSerializerForNoti(required=False)
 
     class Meta:
         model = Notifications
         fields = ['id', 'created_by', 'created_at', 'is_read',
                   'type', 'post', 'poll', 'comment', 'created_for']
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.type == 'comment':
+            if instance.post:
+                data['post']['comment'] = instance.content
+            elif instance.poll:
+                data['poll']['comment'] = instance.content
+            elif instance.comment:
+                data['comment']['child_comment'] = instance.content
+        return data
+
+
+

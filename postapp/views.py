@@ -211,8 +211,8 @@ def create_comment(request):
                 type='comment',
                 created_at=datetime.now(),  # type: ignore
                 created_by=request.user,
-                created_for=comment_id.created_by,
-                comment=comment,
+                created_for=comment_owner,
+                comment=comment_id,
             )
                 notification.save()
                 send_noti_commets_comments(comment_id, comment, comment_owner_fcm_token)
@@ -493,6 +493,7 @@ def get_all_post_poll(request):
 def get_notifications(request):
     user = request.user
     notifications = Notifications.objects.filter(created_for=user).order_by('-created_at')
+    notifications = notifications.filter(created_for=user)
     serializer = NotificationSerializer(notifications, many=True , context = {'notification': notifications})
     return Response(serializer.data)
 
