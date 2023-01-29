@@ -175,13 +175,13 @@ class PollSerializerForNotifications(serializers.ModelSerializer):
 
 class CommentSerializerForNoti(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
-    child_comment = serializers.SerializerMethodField()
+    comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields =[ 'id', 'content', 'created_at', 'created_by' , 'child_comment']
+        fields =[ 'id', 'content', 'created_at', 'created_by' , 'comment']
     
-    def get_child_comment(self, obj):
+    def get_comment(self, obj):
         notification = Notifications.objects.filter(comment=obj, type='comment').order_by('-id')
         if notification.exists():
             return notification.first().content
@@ -206,7 +206,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             elif instance.poll:
                 data['poll']['comment'] = instance.content
             elif instance.comment:
-                data['comment']['child_comment'] = instance.content
+                data['comment']['comment'] = instance.content
         return data
 
 
