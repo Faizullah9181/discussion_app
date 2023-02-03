@@ -21,7 +21,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from .utils import *
 from rest_framework import filters
-
+import time
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -525,3 +525,18 @@ def delete_all_notifications(request):
     notifications.delete()
     return Response({'message': 'All Notifications Deleted'})
 
+
+@api_view(['GET'])
+def say_hello(request):
+    return Response({'message': 'Hello'})
+
+
+# make an api alive that hit say_hello api every  10 sec infinitely once i hit api alive
+@api_view(['GET'])
+def api_alive(request):
+    while True:
+        requests.get("http://127.0.0.1:8000/api/post/hello/")
+        time.sleep(10)
+        print("Api Alive")
+        return Response({'message': 'Api Alive'})
+    

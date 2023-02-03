@@ -14,4 +14,6 @@ urlpatterns = [
     path('like/', views.put_like, name="like"),
     path('all/', views.get_all_post_poll, name="all-posts"),
     path('pdf/', views.create_pdf_post, name="pdf"),
+    path('hello/', views.say_hello, name="hello"),
+    path('alive/', views.api_alive, name="alive"),
 ]
