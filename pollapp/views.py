@@ -1,22 +1,11 @@
-from django.shortcuts import render
 from .models import Poll, PollOption
 from .serializers import PollSerializer, PollSerializer2
-from rest_framework import generics
-from rest_framework import permissions
-from rest_framework import viewsets
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from user.models import Users
-from django.db.models import Q
-from postapp.models import Post, Comment, Like
-from postapp.serializers import PostSerializer, CommentSerializer, LikeSerializer
-from user.serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
-import json
-from django.http import JsonResponse
+
 
 
 def is_voted(poll, user):

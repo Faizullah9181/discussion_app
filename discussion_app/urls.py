@@ -22,13 +22,14 @@ from postapp.views import Like
 from .views import home
 
 urlpatterns = [
-    # path('', TemplateView.as_view(template_name="blog/index.html")),
-    path('',home, name="home"),
+#    path('', TemplateView.as_view(template_name="blog/index.html")),
+    # path('',home, name="home"),
     path('admin/', admin.site.urls),
     path('api/users/', include('user.urls')),
     path('api/post/', include('postapp.urls')),
     path('api/poll/', include('pollapp.urls')),
     path('api/comment/', include('postapp.url.comments_url')),
     path('api/notification/', include('postapp.url.notification_url')),
+    path('api/discussion/', include('postapp.url.discussion_main_url')),
     path('accounts/', include('allauth.urls')),
 ]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

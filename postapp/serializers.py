@@ -80,6 +80,7 @@ class PollOptionSerializer2(serializers.ModelSerializer):
 class PollSerializer(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
     created_by = UserDetailSerializer(read_only=True)
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
@@ -90,11 +91,15 @@ class PollSerializer(serializers.ModelSerializer):
         poll_options = PollOption.objects.filter(poll=obj).order_by('id')
         serializer = PollOptionSerializer(poll_options, many=True)
         return serializer.data
+    
+    def get_id(self, obj):
+        return "poll_" + str(obj.id)
 
 
 class PollSerializer2(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
     created_by = UserDetailSerializer()
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
@@ -105,16 +110,20 @@ class PollSerializer2(serializers.ModelSerializer):
         poll_options = PollOption.objects.filter(poll=obj).order_by('id')
         serializer = PollOptionSerializer2(poll_options, many=True)
         return serializer.data
+    
+    def get_id(self, obj):
+        return "poll_" + str(obj.id)
 
 
 class PostPollSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     poll = PollSerializer(required=False)
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 'views',
-                  'allow_comments', 'is_liked', 'comment_count', 'like_count', 'poll']  # include the 'poll' field
+        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 
+                  'allow_comments', 'is_liked', 'comment_count', 'like_count', 'poll']  
 
     def to_representation(self, instance):
         if isinstance(instance, Post):
@@ -122,10 +131,17 @@ class PostPollSerializer(serializers.ModelSerializer):
         elif isinstance(instance, Poll):
             return PollSerializer(instance).data
 
+    def get_id(self, obj):
+        if isinstance(obj, Post):
+            return "post_" + str(obj.id)  #type: ignore
+        elif isinstance(obj, Poll):
+            return "poll_" + str(obj.id)  #type: ignore
+    
 
 class PostPollSerializer2(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     poll = PollSerializer2(required=False)
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -138,9 +154,13 @@ class PostPollSerializer2(serializers.ModelSerializer):
         elif isinstance(instance, Poll):
             return PollSerializer2(instance).data
 
+    def get_id(self, obj):
+        if isinstance(obj, Post):
+            return "post_" + str(obj.id)  #type: ignore
+        elif isinstance(obj, Poll):
+            return "poll_" + str(obj.id)  #type: ignore
 
-
-
+    
 
 class PostSerializerForNotifications(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
@@ -154,7 +174,7 @@ class PostSerializerForNotifications(serializers.ModelSerializer):
     def get_comment(self, obj):
         notification = Notifications.objects.filter(post=obj, type='comment').order_by('-id')
         if notification.exists():
-            return notification.first().content
+            return notification.first().content   #type: ignore
         return None
 
 
@@ -169,7 +189,7 @@ class PollSerializerForNotifications(serializers.ModelSerializer):
     def get_comment(self, obj):
         notification = Notifications.objects.filter(poll=obj, type='comment').order_by('-id')
         if notification.exists():
-            return notification.first().content
+            return notification.first().content  #type: ignore
         return None
 
 
@@ -184,7 +204,7 @@ class CommentSerializerForNoti(serializers.ModelSerializer):
     def get_comment(self, obj):
         notification = Notifications.objects.filter(comment=obj, type='comment').order_by('-id')
         if notification.exists():
-            return notification.first().content
+            return notification.first().content  #type: ignore
         return None
 
 class NotificationSerializer(serializers.ModelSerializer):
