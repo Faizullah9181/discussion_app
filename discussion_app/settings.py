@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'postapp',
     'rest_framework',
     'mptt',
-    'django.contrib.sites',
+    # 'django.contrib.sites',
 
     'allauth',
     'allauth.account',
@@ -155,7 +155,7 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -278,8 +278,8 @@ SOCIALACCOUNT_ADAPTER = 'discussion_app.adapter.SocialLoginAdapter'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '140391069257-be400t89h6fp1ijhm3d7b5gssl5nre0l.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '140391069257-5ppe37176d6hetj03ul1lno35jcv2086.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis.com/auth/userinfo.email',
                                    'https://www.googleapis.com/auth/userinfo.profile', 'openid']
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']

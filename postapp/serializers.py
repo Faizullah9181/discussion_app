@@ -80,11 +80,11 @@ class PollOptionSerializer2(serializers.ModelSerializer):
 class PollSerializer(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
     created_by = UserDetailSerializer(read_only=True)
-    id = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_at', 'created_by', 'private', 'is_voted', 'is_liked', 'total_votes',
+        fields = ['id','type' ,'title', 'content', 'created_at', 'created_by', 'private', 'is_voted', 'is_liked', 'total_votes',
                   'last_modified_at', 'last_modified_by', 'poll_option', 'allow_comments', 'comment_count', 'like_count']
 
     def get_poll_option(self, obj):
@@ -92,18 +92,18 @@ class PollSerializer(serializers.ModelSerializer):
         serializer = PollOptionSerializer(poll_options, many=True)
         return serializer.data
     
-    def get_id(self, obj):
-        return "poll_" + str(obj.id)
+    def get_type(self, obj):
+        return "poll"
 
 
 class PollSerializer2(serializers.ModelSerializer):
     poll_option = serializers.SerializerMethodField()
     created_by = UserDetailSerializer()
-    id = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
-        fields = ['id', 'title', 'content', 'created_at', 'created_by', 'private', 'is_liked', 'is_voted', 'total_votes',
+        fields = ['id','type' ,'title', 'content', 'created_at', 'created_by', 'private', 'is_liked', 'is_voted', 'total_votes',
                   'last_modified_at', 'last_modified_by', 'poll_option', 'allow_comments', 'comment_count', 'like_count']
 
     def get_poll_option(self, obj):
@@ -111,18 +111,18 @@ class PollSerializer2(serializers.ModelSerializer):
         serializer = PollOptionSerializer2(poll_options, many=True)
         return serializer.data
     
-    def get_id(self, obj):
-        return "poll_" + str(obj.id)
+    def get_type(self, obj):
+        return "poll"
 
 
 class PostPollSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     poll = PollSerializer(required=False)
-    id = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 
+        fields = ['id','type', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 
                   'allow_comments', 'is_liked', 'comment_count', 'like_count', 'poll']  
 
     def to_representation(self, instance):
@@ -130,22 +130,22 @@ class PostPollSerializer(serializers.ModelSerializer):
             return super().to_representation(instance)
         elif isinstance(instance, Poll):
             return PollSerializer(instance).data
-
-    def get_id(self, obj):
+        
+    def get_type(self, obj):
         if isinstance(obj, Post):
-            return "post_" + str(obj.id)  #type: ignore
+            return "post"
         elif isinstance(obj, Poll):
-            return "poll_" + str(obj.id)  #type: ignore
+            return "poll"
     
 
 class PostPollSerializer2(serializers.ModelSerializer):
     created_by = UserDetailSerializer(read_only=True)
     poll = PollSerializer2(required=False)
-    id = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 'views',
+        fields = ['id','type', 'title', 'content', 'created_by', 'created_at', 'post_image', 'last_modified_by', 'last_modified_at', 'views',
                   'allow_comments', 'is_liked', 'comment_count', 'like_count', 'poll']  # include the 'poll' field
 
     def to_representation(self, instance):
@@ -154,11 +154,11 @@ class PostPollSerializer2(serializers.ModelSerializer):
         elif isinstance(instance, Poll):
             return PollSerializer2(instance).data
 
-    def get_id(self, obj):
+    def get_type(self, obj):
         if isinstance(obj, Post):
-            return "post_" + str(obj.id)  #type: ignore
+            return "post"
         elif isinstance(obj, Poll):
-            return "poll_" + str(obj.id)  #type: ignore
+            return "poll"
 
     
 
