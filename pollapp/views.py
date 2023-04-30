@@ -5,7 +5,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from datetime import datetime
+from rest_framework.pagination import LimitOffsetPagination
 
+
+class MyPagination(LimitOffsetPagination):
+    default_limit = 10
+    max_limit = 0
 
 
 def is_voted(poll, user):
@@ -70,8 +75,10 @@ def get_user_polls(request):
     for poll in polls:
         poll.is_voted = is_voted(poll, user)
         poll.is_liked = user in poll.liked_by.all()
-    serializer = PollSerializer(polls, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(polls, request)
+    serializer = PollSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['POST'])
@@ -112,7 +119,9 @@ def get_all_polls(request):
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PollSerializer(poll)
             p.append(serializer.data)
-    return Response(p, status=status.HTTP_200_OK)
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(p, request)
+    return paginator.get_paginated_response(result_page)
 
 # def get_all_polls(request):
 #     user = request.user
@@ -155,7 +164,7 @@ def vote_poll(request):
             return Response({'message': 'You have already voted for this poll'}, status=status.HTTP_401_UNAUTHORIZED)
     poll_option = PollOption.objects.get(id=data['poll_option_id'])
     poll.is_liked = user in poll.liked_by.all()
-    poll.total_votes += 1
+    poll.total_votes += 1  # type: ignore
     poll.save()
     poll_option.voted_by.add(user)
     for poll_option in poll_options:

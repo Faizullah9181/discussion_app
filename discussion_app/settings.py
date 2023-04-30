@@ -177,10 +177,10 @@ WSGI_APPLICATION = 'discussion_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nexusdiscuss_6snf',
-        'USER': 'nexusdiscuss_6snf_user',
-        'PASSWORD': 'LwaYh1gdxQHkiiQr4p7ILhk16EZmjkcU',
-        'HOST': 'dpg-cf6kdgsgqg47vk0ql5ag-a.oregon-postgres.render.com',
+        'NAME': 'neondb',
+        'USER': 'Faizullah9181',
+        'PASSWORD': 'j4HGfvpJcN6i',
+        'HOST': 'ep-bitter-hill-232400-pooler.ap-southeast-1.aws.neon.tech',
         'PORT': '5432',
     }
 }

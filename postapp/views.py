@@ -17,11 +17,16 @@ from bs4 import BeautifulSoup
 from pdf2image import convert_from_path
 import cloudinary
 import subprocess
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 from django.db.models import Q
 from .utils import *
 from rest_framework import filters
 import time
+
+
+class MyPagination(LimitOffsetPagination):
+    default_limit = 10
+    max_limit = 100
 
 
 @api_view(['GET'])
@@ -33,8 +38,10 @@ def get_user_posts(request, pk):
             post.is_liked = True
         else:
             post.is_liked = False
-    serializer = PostSerializer(posts, many=True)
-    return Response(serializer.data)
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(posts, request)
+    serializer = PostSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['GET'])
@@ -46,8 +53,10 @@ def get_posts(request):
             post.is_liked = True
         else:
             post.is_liked = False
-    serializer = PostSerializer(posts, many=True)
-    return Response(serializer.data)
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(posts, request)
+    serializer = PostSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['GET'])
@@ -237,23 +246,29 @@ def get_comments(request):
             post = Post.objects.get(id=post_id)
             comments = Comment.objects.filter(
                 post=post).order_by('-created_at')
+            paginator = MyPagination()
+            result_page = paginator.paginate_queryset(comments, request)
             serializer = CommentSerializer(
-                comments, many=True, context={'request': user_id})
-            return Response(serializer.data)
+                result_page, many=True, context={'request': user_id})
+            return paginator.get_paginated_response(serializer.data)
         elif poll_id:
             poll = Poll.objects.get(id=poll_id)
             comments = Comment.objects.filter(
                 poll=poll).order_by('-created_at')
+            paginator = MyPagination()
+            result_page = paginator.paginate_queryset(comments, request)
             serializer = CommentSerializer(
-                comments, many=True, context={'request': user_id})
-            return Response(serializer.data)
+                result_page, many=True, context={'request': user_id})
+            return paginator.get_paginated_response(serializer.data)
         elif comment_id:
             parent_id = Comment.objects.get(id=comment_id)
             comments = Comment.objects.filter(
                 parent_id=parent_id).order_by('-created_at')
+            paginator = MyPagination()
+            result_page = paginator.paginate_queryset(comments, request)
             serializer = CommentSerializer(
-                comments, many=True, context={'request': user_id})
-            return Response(serializer.data)
+                result_page, many=True, context={'request': user_id})
+            return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['POST'])
@@ -463,10 +478,6 @@ def create_pdf_post(request):
             os.remove(image_path)
 
     return Response({'message': 'Post Created'}, status=status.HTTP_201_CREATED)
-
-
-class MyPagination(PageNumberPagination):
-    page_size = 5
 
 
 @api_view(['GET'])
