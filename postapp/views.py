@@ -570,3 +570,9 @@ def delete_all_notifications(request):
 @api_view(['GET'])
 def say_hello(request):
     return Response({'message': 'Hello'})
+
+
+@api_view(['POST'])
+def shiprocket_hook(request):
+    print(request.data)
+    return Response({'message': 'Hello'})
