@@ -70,14 +70,15 @@ def get_poll(request, poll_id):
 @permission_classes([IsAuthenticated])
 def get_user_polls(request):
     user = request.user
-    polls = Poll.objects.filter(created_by=user)
+    paginator = MyPagination()
+    # polls = Poll.objects.filter(created_by=user)
+    polls = paginator.paginate_queryset(
+        Poll.objects.filter(created_by=user), request)
     poll_options = PollOption.objects.filter(poll__in=polls)
     for poll in polls:
         poll.is_voted = is_voted(poll, user)
         poll.is_liked = user in poll.liked_by.all()
-    paginator = MyPagination()
-    result_page = paginator.paginate_queryset(polls, request)
-    serializer = PollSerializer(result_page, many=True)
+    serializer = PollSerializer(polls, many=True)
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -97,7 +98,8 @@ def delete_poll(request, poll_id):
 @permission_classes([IsAuthenticated])
 def get_all_polls(request):
     user = request.user
-    polls = Poll.objects.all()
+    paginator = MyPagination()
+    polls = paginator.paginate_queryset(Poll.objects.all(), request)
     poll_options = PollOption.objects.filter(poll__in=polls)
     p = []
     for poll in polls:
@@ -119,9 +121,7 @@ def get_all_polls(request):
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PollSerializer(poll)
             p.append(serializer.data)
-    paginator = MyPagination()
-    result_page = paginator.paginate_queryset(p, request)
-    return paginator.get_paginated_response(result_page)
+    return paginator.get_paginated_response(p)
 
 # def get_all_polls(request):
 #     user = request.user

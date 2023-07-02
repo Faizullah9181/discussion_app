@@ -13,6 +13,5 @@ urlpatterns = [
     path('getpostscount/', views.get_posts_count, name="posts-count"),
     path('like/', views.put_like, name="like"),
     path('pdf/', views.create_pdf_post, name="pdf"),
-    path('hello/', views.say_hello, name="hello"),
-    path('hook/', views.shiprocket_hook, name="hook")
+    path('hello/', views.say_hello, name="hello")
 ]

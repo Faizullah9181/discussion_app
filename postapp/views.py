@@ -32,30 +32,32 @@ class MyPagination(LimitOffsetPagination):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_posts(request, pk):
-    posts = Post.objects.filter(created_by=pk).order_by('-id')
+    paginator = MyPagination()
+    posts = paginator.paginate_queryset(
+        Post.objects.filter(created_by=pk).order_by('-id'), request)
     for post in posts:
         if post.Liked_by.filter(id=request.user.id).exists():
             post.is_liked = True
         else:
             post.is_liked = False
-    paginator = MyPagination()
-    result_page = paginator.paginate_queryset(posts, request)
-    serializer = PostSerializer(result_page, many=True)
+    serializer = PostSerializer(posts, many=True)
     return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_posts(request):
-    posts = Post.objects.all().order_by('-id')
+    paginator = MyPagination()
+    posts = paginator.paginate_queryset(
+        Post.objects.all().order_by('-id'), request)
+    print(posts)
     for post in posts:
         if post.Liked_by.filter(id=request.user.id).exists():
             post.is_liked = True
         else:
             post.is_liked = False
-    paginator = MyPagination()
-    result_page = paginator.paginate_queryset(posts, request)
-    serializer = PostSerializer(result_page, many=True)
+
+    serializer = PostSerializer(posts, many=True)
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -243,31 +245,30 @@ def get_comments(request):
     comment_id = data.get('comment_id')
     if post_id or poll_id or comment_id:
         if post_id:
-            post = Post.objects.get(id=post_id)
-            comments = Comment.objects.filter(
-                post=post).order_by('-created_at')
             paginator = MyPagination()
-            result_page = paginator.paginate_queryset(comments, request)
+            post = paginator.paginate_queryset(
+                Post.objects.filter(id=post_id), request)
+            comments = paginator.paginate_queryset(
+                Comment.objects.filter(post=post), request)
             serializer = CommentSerializer(
-                result_page, many=True, context={'request': user_id})
+                comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
         elif poll_id:
-            poll = Poll.objects.get(id=poll_id)
-            comments = Comment.objects.filter(
-                poll=poll).order_by('-created_at')
             paginator = MyPagination()
-            result_page = paginator.paginate_queryset(comments, request)
+            poll = paginator.paginate_queryset(
+                Poll.objects.filter(id=poll_id), request)
+            comments = paginator.paginate_queryset(
+                Comment.objects.filter(poll=poll), request)
             serializer = CommentSerializer(
-                result_page, many=True, context={'request': user_id})
+                comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
         elif comment_id:
             parent_id = Comment.objects.get(id=comment_id)
-            comments = Comment.objects.filter(
-                parent_id=parent_id).order_by('-created_at')
             paginator = MyPagination()
-            result_page = paginator.paginate_queryset(comments, request)
+            comments = paginator.paginate_queryset(
+                Comment.objects.filter(parent_id=parent_id), request)
             serializer = CommentSerializer(
-                result_page, many=True, context={'request': user_id})
+                comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
 
 
@@ -484,8 +485,11 @@ def create_pdf_post(request):
 @permission_classes([IsAuthenticated])
 def get_all_post_poll(request):
     user = request.user
-    posts = Post.objects.all().order_by('-created_at')
-    polls = Poll.objects.all().order_by('-created_at')
+    paginator = MyPagination()
+    posts = paginator.paginate_queryset(
+        Post.objects.all().order_by('-created_at'), request)
+    polls = paginator.paginate_queryset(
+        Poll.objects.all().order_by('-created_at'), request)
     poll_options = PollOption.objects.filter(poll__in=polls)
     p = []
     for post in posts:
@@ -520,9 +524,7 @@ def get_all_post_poll(request):
     all_post_poll = list(chain(posts, polls))
     all_post_poll.sort(key=lambda x: x.created_at,    # type: ignore
                        reverse=True)
-    paginator = MyPagination()
-    result_page = paginator.paginate_queryset(all_post_poll, request)
-    serializer = PostPollSerializer(result_page, many=True)
+    serializer = PostPollSerializer(all_post_poll, many=True)
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -571,10 +573,4 @@ def delete_all_notifications(request):
 
 @api_view(['GET'])
 def say_hello(request):
-    return Response({'message': 'Hello'})
-
-
-@api_view(['POST'])
-def shiprocket_hook(request):
-    print(request.data)
     return Response({'message': 'Hello'})
