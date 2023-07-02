@@ -533,9 +533,11 @@ def get_notifications(request):
     notifications = Notifications.objects.filter(
         created_for=user).order_by('-created_at')
     notifications = notifications.filter(created_for=user)
-    serializer = NotificationSerializer(notifications, many=True, context={
+    paginator = MyPagination()
+    result_page = paginator.paginate_queryset(notifications, request)
+    serializer = NotificationSerializer(result_page, many=True, context={
                                         'notification': notifications})
-    return Response(serializer.data)
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['POST'])
