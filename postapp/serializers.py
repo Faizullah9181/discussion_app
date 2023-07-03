@@ -31,7 +31,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class CommentSerializerForReply(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('id')
+        fields = ('id', 'content', 'created_at', 'created_by', 'is_liked', 'like_count')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -53,15 +53,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         replies = Comment.objects.filter(parent_id=obj.id).order_by('-id')
-        # serializer = CommentSerializer(
-        #     replies, many=True, context=self.context)
-        # return serializer.data
-        serializer = CommentSerializer(
-            replies, many=True, context=self.context)
-        id = []
-        for reply in serializer.data:
-            id.append(reply['id'])
-        return id
+        serializer = CommentSerializerForReply(replies, many=True)
+        return serializer.data
 
 
 class EmptyArrayField(serializers.Field):

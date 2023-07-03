@@ -246,19 +246,15 @@ def get_comments(request):
     if post_id or poll_id or comment_id:
         if post_id:
             paginator = MyPagination()
-            post = paginator.paginate_queryset(
-                Post.objects.filter(id=post_id), request)
             comments = paginator.paginate_queryset(
-                Comment.objects.filter(post=post), request)
+                Comment.objects.filter(post_id=post_id), request)
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
         elif poll_id:
             paginator = MyPagination()
-            poll = paginator.paginate_queryset(
-                Poll.objects.filter(id=poll_id), request)
             comments = paginator.paginate_queryset(
-                Comment.objects.filter(poll=poll), request)
+                Comment.objects.filter(poll_id=poll_id), request)
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
