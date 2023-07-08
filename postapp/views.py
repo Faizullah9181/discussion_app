@@ -5,6 +5,7 @@ from user.models import Users
 from rest_framework.response import Response
 from rest_framework import status
 from pollapp.models import Poll, PollOption
+from pollapp.serializers import PollSerializer, PollSerializer2
 from .models import Post, Comment, Like, Notifications
 from .serializers import PostSerializer, CommentSerializer, PostPollSerializer, PollOptionSerializer2, NotificationSerializer, PostPollSerializer2
 import datetime
@@ -482,10 +483,8 @@ def create_pdf_post(request):
 def get_all_post_poll(request):
     user = request.user
     paginator = MyPagination()
-    posts = paginator.paginate_queryset(
-        Post.objects.all().order_by('-created_at'), request)
-    polls = paginator.paginate_queryset(
-        Poll.objects.all().order_by('-created_at'), request)
+    posts = Post.objects.all().order_by('-created_at')
+    polls = Poll.objects.all().order_by('-created_at')
     poll_options = PollOption.objects.filter(poll__in=polls)
     p = []
     for post in posts:
@@ -517,11 +516,13 @@ def get_all_post_poll(request):
             poll.is_liked = poll.liked_by.filter(id=user.id).exists()
             serializer = PostPollSerializer(poll)
             p.append(serializer.data)
-    all_post_poll = list(chain(posts, polls))
-    all_post_poll.sort(key=lambda x: x.created_at,    # type: ignore
-                       reverse=True)
-    serializer = PostPollSerializer(all_post_poll, many=True)
-    return paginator.get_paginated_response(serializer.data)
+
+    postserializer = PostPollSerializer(posts, many=True)
+    all_post_poll = list(chain(postserializer.data, p))
+    print(all_post_poll)
+    all_post_poll.sort(key=lambda x: x['created_at'], reverse=True)
+    result_page = paginator.paginate_queryset(all_post_poll, request)
+    return paginator.get_paginated_response(result_page)
 
 
 @api_view(['GET'])

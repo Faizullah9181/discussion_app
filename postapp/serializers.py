@@ -29,6 +29,8 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializerForReply(serializers.ModelSerializer):
+    created_by = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = ('id', 'content', 'created_at', 'created_by',
