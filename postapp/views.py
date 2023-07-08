@@ -519,7 +519,6 @@ def get_all_post_poll(request):
 
     postserializer = PostPollSerializer(posts, many=True)
     all_post_poll = list(chain(postserializer.data, p))
-    print(all_post_poll)
     all_post_poll.sort(key=lambda x: x['created_at'], reverse=True)
     result_page = paginator.paginate_queryset(all_post_poll, request)
     return paginator.get_paginated_response(result_page)
