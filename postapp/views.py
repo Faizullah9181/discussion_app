@@ -250,14 +250,14 @@ def get_comments(request):
         if post_id:
             paginator = MyPagination()
             comments = paginator.paginate_queryset(
-                Comment.objects.filter(post_id=post_id), request)
+                Comment.objects.filter(post_id=post_id).order_by('-created_at'), request)
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
         elif poll_id:
             paginator = MyPagination()
             comments = paginator.paginate_queryset(
-                Comment.objects.filter(poll_id=poll_id), request)
+                Comment.objects.filter(poll_id=poll_id).order_by('-created_at'), request)
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
@@ -265,7 +265,7 @@ def get_comments(request):
             parent_id = Comment.objects.get(id=comment_id)
             paginator = MyPagination()
             comments = paginator.paginate_queryset(
-                Comment.objects.filter(parent_id=parent_id), request)
+                Comment.objects.filter(parent_id=parent_id).order_by('-created_at'), request)
             serializer = CommentSerializer(
                 comments, many=True, context={'request': user_id})
             return paginator.get_paginated_response(serializer.data)
@@ -485,8 +485,15 @@ def create_pdf_post(request):
 def get_all_post_poll(request):
     user = request.user
     paginator = MyPagination()
-    posts = Post.objects.all().order_by('-created_at')
-    polls = Poll.objects.all().order_by('-created_at')
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+    count = Post.objects.all().count() + Poll.objects.all().count()
+    if limit and offset:
+        posts = Post.objects.all().order_by('-created_at')[int(offset):int(limit)+int(offset)]
+        polls = Poll.objects.all().order_by('-created_at')[int(offset):int(limit)+int(offset)]
+    else:
+        posts = Post.objects.all().order_by('-created_at')
+        polls = Poll.objects.all().order_by('-created_at')
     poll_options = PollOption.objects.filter(poll__in=polls)
     p = []
     for post in posts:
@@ -523,6 +530,7 @@ def get_all_post_poll(request):
     all_post_poll = list(chain(postserializer.data, p))
     all_post_poll.sort(key=lambda x: x['created_at'], reverse=True)
     result_page = paginator.paginate_queryset(all_post_poll, request)
+    paginator.count = count
     return paginator.get_paginated_response(result_page)
 
 
