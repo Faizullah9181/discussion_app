@@ -117,7 +117,7 @@ def delete_post(request, pk):
     return Response({'detail': 'Post deleted'}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def getUserDetails(request):
     data = request.data
