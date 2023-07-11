@@ -122,16 +122,15 @@ def delete_post(request, pk):
 def getUserDetails(request):
     data = request.data
     user_name = data['username']
-    user = Users.objects.get(username=user_name)  
+    user = Users.objects.get(username=user_name)
     return Response({'user': user.id,
-                        'username': user.username,
-                        'user_post_count': Post.objects.filter(created_by=user).count(),
-                        'user_poll_count': Poll.objects.filter(created_by=user).count(),
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'user_image': user.image,
-                        })
-                            
+                     'username': user.username,
+                     'user_post_count': Post.objects.filter(created_by=user).count(),
+                     'user_poll_count': Poll.objects.filter(created_by=user).count(),
+                     'first_name': user.first_name,
+                     'last_name': user.last_name,
+                     'user_image': user.image,
+                     })
 
 
 @api_view(['GET'])
@@ -485,15 +484,8 @@ def create_pdf_post(request):
 def get_all_post_poll(request):
     user = request.user
     paginator = MyPagination()
-    limit = request.GET.get('limit')
-    offset = request.GET.get('offset')
-    count = Post.objects.all().count() + Poll.objects.all().count()
-    if limit and offset:
-        posts = Post.objects.all().order_by('-created_at')[int(offset):int(limit)+int(offset)]
-        polls = Poll.objects.all().order_by('-created_at')[int(offset):int(limit)+int(offset)]
-    else:
-        posts = Post.objects.all().order_by('-created_at')
-        polls = Poll.objects.all().order_by('-created_at')
+    posts = Post.objects.all().order_by('-created_at')
+    polls = Poll.objects.all().order_by('-created_at')
     poll_options = PollOption.objects.filter(poll__in=polls)
     p = []
     for post in posts:
@@ -530,7 +522,6 @@ def get_all_post_poll(request):
     all_post_poll = list(chain(postserializer.data, p))
     all_post_poll.sort(key=lambda x: x['created_at'], reverse=True)
     result_page = paginator.paginate_queryset(all_post_poll, request)
-    paginator.count = count
     return paginator.get_paginated_response(result_page)
 
 
