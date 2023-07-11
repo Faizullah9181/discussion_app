@@ -174,28 +174,28 @@ WSGI_APPLICATION = 'discussion_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'Faizullah9181',
-        'PASSWORD': 'j4HGfvpJcN6i',
-        'HOST': 'ep-bitter-hill-232400-pooler.ap-southeast-1.aws.neon.tech',
-        'PORT': '5432',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django_cockroachdb',
-#         'NAME': 'defaultdb',
-#         'USER': 'nexus',
-#         'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
-#         'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
-#         'PORT': '26257',
-#     },
-
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'neondb',
+#         'USER': 'Faizullah9181',
+#         'PASSWORD': 'j4HGfvpJcN6i',
+#         'HOST': 'ep-bitter-hill-232400-pooler.ap-southeast-1.aws.neon.tech',
+#         'PORT': '5432',
+#     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django_cockroachdb',
+        'NAME': 'defaultdb',
+        'USER': 'nexus',
+        'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
+        'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
+        'PORT': '26257',
+    },
+
+}
 
 
 # DATABASES = {
