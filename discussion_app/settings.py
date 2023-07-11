@@ -13,9 +13,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from datetime import timedelta
 import cloudinary
+# import environ
+
+# env = environ.Env()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -27,6 +32,7 @@ SECRET_KEY = '&qi#k!pgp8n%z#lb&62d2^5=5h!%l4uz584qet#8+-(z)9$k@b'
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+
 
 # Application definition
 
@@ -89,6 +95,30 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+# DJOSER = {
+#     'LOGIN_FIELD': 'email',
+#     'USER_CREATE_PASSWORD_RETYPE': True,
+#     'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+#     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+#     # 'SEND_CONFIRMATION_EMAIL': True,
+#     'SET_USERNAME_RETYPE': True,
+#     'SET_PASSWORD_RETYPE':False,
+#     'ACTIVATE_USER_AFTER_REGISTRATION': True,
+#     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+#     'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+#     # 'ACTIVATION_URL': 'activate/{uid}/{token}',
+#     # 'SEND_ACTIVATION_EMAIL': True,
+#     'LOGIN_REDIRECT_URL': 'http://localhost:8000/',
+#     'SIGNUP_REDIRECT_URL': 'http://localhost:8000/',
+#     'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+#     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000/google'],
+#     'SERIALIZERS': {
+#         'user_create': 'user.serializers.UserSerializer',
+#         'user': 'user.serializers.UserSerializer',
+#         'current_user': 'user.serializers.UserSerializer',
+#     }
+# }
+
 AUTH_USER_MODEL = 'user.Users'
 
 AUTHENTICATION_BACKENDS = (
@@ -97,6 +127,7 @@ AUTHENTICATION_BACKENDS = (
     'user.backends.EmailPhoneUsernameAuthenticationBackend'
 
 )
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -115,9 +146,11 @@ ROOT_URLCONF = 'discussion_app.urls'
 
 SITE_ID = 2
 
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 TEMPLATES = [
     {
@@ -137,20 +170,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'discussion_app.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django_cockroachdb',
-        'NAME': 'defaultdb',
-        'USER': 'nexus',
-        'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
-        'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
-        'PORT': '26257',
-    },
-
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'Faizullah9181',
+        'PASSWORD': 'j4HGfvpJcN6i',
+        'HOST': 'ep-bitter-hill-232400-pooler.ap-southeast-1.aws.neon.tech',
+        'PORT': '5432',
+    }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django_cockroachdb',
+#         'NAME': 'defaultdb',
+#         'USER': 'nexus',
+#         'PASSWORD': 'eX7cerQ7otfhF_kdD2Kgrg',
+#         'HOST': 'rapid-octopus-2127.7s5.cockroachlabs.cloud',
+#         'PORT': '26257',
+#     },
+
+# }
 
 
 # DATABASES = {
@@ -159,6 +204,7 @@ DATABASES = {
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -178,6 +224,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -191,6 +238,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -201,6 +249,7 @@ STATICFILES_DIRS = [
 ]
 
 LOGIN_REDIRECT_URL = '/'
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -243,6 +292,7 @@ CORS_ORIGIN_WHITELIST = [
 
 ]
 
+
 # cloudinary.config(
 # cloud_name = 'dyjqmfjwh',
 # api_key = '734827844593252',
@@ -256,3 +306,5 @@ cloudinary.config(
     api_key='365359829586928',
     api_secret='UmbbB_gREjWGdFj-GsZcQ8m4D5Q',
 )
+
+# GOOGLE_APPLICATION_CREDENTIALS = env.str('GOOGLE_APPLICATION_CREDENTIALS')
